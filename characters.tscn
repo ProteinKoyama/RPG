@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://c38ogu73ftn1o"]
+
+[ext_resource type="Script" path="res://characters.gd" id="1_5ur66"]
+[ext_resource type="Texture2D" uid="uid://xi15xo7c13tu" path="res://assets/charachip/charatip_default.svg" id="1_h4j02"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e1idu"]
+size = Vector2(310, 390)
+
+[sub_resource type="LabelSettings" id="LabelSettings_b8pgw"]
+font_size = 128
+outline_size = 50
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Characters" type="Node2D"]
+light_mask = 2
+script = ExtResource("1_5ur66")
+
+[node name="Test" type="StaticBody2D" parent="."]
+light_mask = 2
+scale = Vector2(0.1, 0.1)
+
+[node name="AnimatedSprite2D" type="Sprite2D" parent="Test"]
+texture = ExtResource("1_h4j02")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Test"]
+position = Vector2(-5.00001, -5.00001)
+shape = SubResource("RectangleShape2D_e1idu")
+
+[node name="Label" type="Label" parent="Test"]
+offset_left = 280.0
+offset_top = -190.0
+offset_right = 986.0
+offset_bottom = -15.0
+text = "Hello world"
+label_settings = SubResource("LabelSettings_b8pgw")

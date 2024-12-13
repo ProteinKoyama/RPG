@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://bgvi3n5rd5hpi"]
+
+[ext_resource type="PackedScene" uid="uid://dxt4sxxfd3oup" path="res://player.tscn" id="1_hmr6d"]
+[ext_resource type="PackedScene" uid="uid://bk50j7ceajika" path="res://map.tscn" id="1_x70te"]
+[ext_resource type="PackedScene" uid="uid://c38ogu73ftn1o" path="res://characters.tscn" id="3_13dw6"]
+
+[node name="Main" type="Node"]
+
+[node name="Maps" parent="." instance=ExtResource("1_x70te")]
+visibility_layer = 2
+
+[node name="Characters" parent="." instance=ExtResource("3_13dw6")]
+position = Vector2(208, 588)
+
+[node name="Player" parent="." instance=ExtResource("1_hmr6d")]
+position = Vector2(48, 598)
+
+[connection signal="interact_signal" from="Player" to="Characters" method="_on_player_interact_signal"]
