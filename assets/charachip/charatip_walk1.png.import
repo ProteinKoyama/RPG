@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dd3xnmgwi8eju"
-path="res://.godot/imported/charatip_default.svg-e954141fba490a76e7ff131c3cc7b806.ctex"
+uid="uid://c085fks0f0ony"
+path="res://.godot/imported/charatip_walk1.png-e86554b9634097c47a4d8850718f1c4b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/charachip/charatip_default.svg"
-dest_files=["res://.godot/imported/charatip_default.svg-e954141fba490a76e7ff131c3cc7b806.ctex"]
+source_file="res://assets/charachip/charatip_walk1.png"
+dest_files=["res://.godot/imported/charatip_walk1.png-e86554b9634097c47a4d8850718f1c4b.ctex"]
 
 [params]
 
@@ -32,6 +32,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

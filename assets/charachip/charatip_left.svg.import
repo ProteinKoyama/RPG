@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dd3xnmgwi8eju"
-path="res://.godot/imported/charatip_default.svg-e954141fba490a76e7ff131c3cc7b806.ctex"
+uid="uid://cjyltk77kc08q"
+path="res://.godot/imported/charatip_left.svg-eff418be77e675d71144648622327258.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/charachip/charatip_default.svg"
-dest_files=["res://.godot/imported/charatip_default.svg-e954141fba490a76e7ff131c3cc7b806.ctex"]
+source_file="res://assets/charachip/charatip_left.svg"
+dest_files=["res://.godot/imported/charatip_left.svg-eff418be77e675d71144648622327258.ctex"]
 
 [params]
 
