@@ -1,18 +1,22 @@
-extends Node2D
+extends StaticBody2D
 
+signal character_interacted_signal
 
-# Called when the node enters the scene tree for the first time.
+var interacted_flag = false
+var char_in_area_flag = false
+var char_body
+
 func _ready() -> void:
-	for chars in self.get_children():
-		for child in chars.get_children():
-			if child is Label:
-				child.hide()
+	pass
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	pass
-
-
-func _on_player_interact_signal() -> void:
-	pass
+	if char_in_area_flag:
+		if Input.is_action_pressed("interact"):
+			emit_signal("character_interacted_signal",char_body)
+			
+func _on_area_2d_body_entered(body: Node2D) -> void:
+	char_in_area_flag = true
+	char_body = self
+func _on_area_2d_body_exited(body: Node2D) -> void:
+	char_in_area_flag = false
+	char_body = null

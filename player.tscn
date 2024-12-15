@@ -97,7 +97,8 @@ animations = [{
 size = Vector2(420, 470)
 
 [node name="Player" type="CharacterBody2D"]
-scale = Vector2(0.15, 0.15)
+scale = Vector2(0.12, 0.12)
+collision_mask = 2
 platform_wall_layers = 2
 script = ExtResource("1_en5um")
 metadata/_edit_group_ = true
@@ -107,6 +108,7 @@ sprite_frames = SubResource("SpriteFrames_rqfxc")
 animation = &"walk_right"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 2
 position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_cjolb")
 

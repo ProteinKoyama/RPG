@@ -1,7 +1,5 @@
 extends CharacterBody2D
 
-signal interact_signal
-
 @export var speed = 200
 var screen_size
 var character_size= Vector2.ZERO
@@ -13,42 +11,41 @@ func _ready():
 	
 func _process(delta):
 	var velocity = Vector2.ZERO
-
-	if Input.is_action_pressed("move_right"):
-		velocity.x += 1
-		$AnimationSprite2D.animation = "walk_right"
-		character_directions = "right"
-	if Input.is_action_pressed("move_left"):
-		velocity.x -= 1
-		$AnimationSprite2D.animation = "walk_left"
-		character_directions = "left"
-	if Input.is_action_pressed("move_up"):
-		$AnimationSprite2D.animation = "back_walk"
-		velocity.y -= 1
-		character_directions = "back"
-	if Input.is_action_pressed("move_down"):
-		$AnimationSprite2D.animation = "walk_front"
-		velocity.y += 1
-		character_directions = "front"
-	if velocity.length() > 0:
-		velocity = velocity.normalized() * speed
-		$AnimationSprite2D.play()
-	else:
-		$AnimationSprite2D.animation = "default"
-		if character_directions == "right":
-			$AnimationSprite2D.animation = "right"
-		if character_directions == "left":
-			$AnimationSprite2D.animation = "left"
-		if character_directions == "back":
-			$AnimationSprite2D.animation = "back"
+	if !$"../MessageWindow".visible:
+		if Input.is_action_pressed("move_right"):
+			velocity.x += 1
+			$AnimationSprite2D.animation = "walk_right"
+			character_directions = "right"
+		if Input.is_action_pressed("move_left"):
+			velocity.x -= 1
+			$AnimationSprite2D.animation = "walk_left"
+			character_directions = "left"
+		if Input.is_action_pressed("move_up"):
+			$AnimationSprite2D.animation = "back_walk"
+			velocity.y -= 1
+			character_directions = "back"
+		if Input.is_action_pressed("move_down"):
+			$AnimationSprite2D.animation = "walk_front"
+			velocity.y += 1
+			character_directions = "front"
+		if velocity.length() > 0:
+			velocity = velocity.normalized() * speed
+			$AnimationSprite2D.play()
+		else:
+			$AnimationSprite2D.animation = "default"
+			if character_directions == "right":
+				$AnimationSprite2D.animation = "right"
+			if character_directions == "left":
+				$AnimationSprite2D.animation = "left"
+			if character_directions == "back":
+				$AnimationSprite2D.animation = "back"
 	position += velocity * delta
 	position = position.clamp(Vector2.ZERO, screen_size)
-
+	velocity = move_and_slide()
 	if Input.is_action_pressed("interact") and !key_detected_flag:
-			print("interact")
-			emit_signal("interact_signal")
-			$InteractTimer.start()
-			key_detected_flag = true
+		$InteractTimer.start()
+		key_detected_flag = true
+	
 
 func _on_interact_timer_timeout() -> void:
 	if key_detected_flag:

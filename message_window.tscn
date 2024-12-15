@@ -1,7 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://cjk7od8f35142"]
+[gd_scene load_steps=7 format=3 uid="uid://cjk7od8f35142"]
 
 [ext_resource type="Script" path="res://message_window.gd" id="1_oj84q"]
-[ext_resource type="Texture2D" uid="uid://3ek3g8oljlks" path="res://assets/charicon.png" id="2_dq5vm"]
 
 [sub_resource type="Theme" id="Theme_jglfy"]
 
@@ -10,12 +9,19 @@ font_size = 20
 
 [sub_resource type="LabelSettings" id="LabelSettings_ca43x"]
 line_spacing = 2.0
-font_size = 32
+font_size = 24
+
+[sub_resource type="Theme" id="Theme_fesxi"]
+default_font_size = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fe3wd"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_color = Color(0.8, 0.8, 0.8, 0)
 
 [node name="MessageWindow" type="CanvasLayer"]
 script = ExtResource("1_oj84q")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="TalkWindow" type="Panel" parent="."]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -29,30 +35,23 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_jglfy")
 
-[node name="Button" type="Button" parent="Panel"]
-visible = false
+[node name="HBoxContainer" type="HBoxContainer" parent="TalkWindow"]
 layout_mode = 0
 offset_right = 1000.0
 offset_bottom = 128.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
-layout_mode = 0
-offset_right = 1000.0
-offset_bottom = 128.0
-
-[node name="TextureRect" type="TextureRect" parent="Panel/HBoxContainer"]
-layout_mode = 2
-texture = ExtResource("2_dq5vm")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="TalkWindow/HBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Panel/HBoxContainer/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TalkWindow/HBoxContainer"]
 layout_mode = 2
-text = "プロテイン小山"
+
+[node name="Label" type="Label" parent="TalkWindow/HBoxContainer/VBoxContainer"]
+layout_mode = 2
 label_settings = SubResource("LabelSettings_abcxt")
 
-[node name="Label" type="Label" parent="Panel"]
+[node name="Label" type="Label" parent="TalkWindow"]
+layout_mode = 0
 offset_left = 140.0
 offset_top = 29.0
 offset_right = 990.0
@@ -61,4 +60,14 @@ text = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
 label_settings = SubResource("LabelSettings_ca43x")
 autowrap_mode = 3
 
-[connection signal="pressed" from="Panel/Button" to="." method="_on_button_pressed"]
+[node name="Button" type="Button" parent="TalkWindow"]
+layout_mode = 0
+offset_left = 940.0
+offset_top = 68.0
+offset_right = 1000.0
+offset_bottom = 128.0
+theme = SubResource("Theme_fesxi")
+theme_override_styles/normal = SubResource("StyleBoxFlat_fe3wd")
+text = "→"
+
+[connection signal="pressed" from="TalkWindow/Button" to="." method="_on_button_pressed"]
