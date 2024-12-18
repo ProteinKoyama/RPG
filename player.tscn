@@ -112,6 +112,9 @@ light_mask = 2
 position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_cjolb")
 
-[node name="InteractTimer" type="Timer" parent="."]
-
-[connection signal="timeout" from="InteractTimer" to="." method="_on_interact_timer_timeout"]
+[node name="Label" type="Label" parent="."]
+visible = false
+offset_right = 40.0
+offset_bottom = 23.0
+scale = Vector2(1e-05, 1e-05)
+text = "player:test"

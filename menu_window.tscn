@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://646qglchrkit"]
+
+[ext_resource type="Script" path="res://menu_window.gd" id="1_s8qau"]
+
+[node name="MenuWindow" type="CanvasLayer"]
+script = ExtResource("1_s8qau")
+
+[node name="Panel" type="Panel" parent="."]
+offset_right = 1200.0
+offset_bottom = 697.0

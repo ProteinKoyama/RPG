@@ -7,16 +7,16 @@
 [sub_resource type="LabelSettings" id="LabelSettings_abcxt"]
 font_size = 20
 
-[sub_resource type="LabelSettings" id="LabelSettings_ca43x"]
-line_spacing = 2.0
-font_size = 24
-
 [sub_resource type="Theme" id="Theme_fesxi"]
 default_font_size = 32
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fe3wd"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 border_color = Color(0.8, 0.8, 0.8, 0)
+
+[sub_resource type="LabelSettings" id="LabelSettings_ca43x"]
+line_spacing = 2.0
+font_size = 24
 
 [node name="MessageWindow" type="CanvasLayer"]
 script = ExtResource("1_oj84q")
@@ -48,17 +48,8 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="TalkWindow/HBoxContainer/VBoxContainer"]
 layout_mode = 2
+text = "test"
 label_settings = SubResource("LabelSettings_abcxt")
-
-[node name="Label" type="Label" parent="TalkWindow"]
-layout_mode = 0
-offset_left = 140.0
-offset_top = 29.0
-offset_right = 990.0
-offset_bottom = 128.0
-text = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest"
-label_settings = SubResource("LabelSettings_ca43x")
-autowrap_mode = 3
 
 [node name="Button" type="Button" parent="TalkWindow"]
 layout_mode = 0
@@ -69,5 +60,14 @@ offset_bottom = 128.0
 theme = SubResource("Theme_fesxi")
 theme_override_styles/normal = SubResource("StyleBoxFlat_fe3wd")
 text = "→"
+
+[node name="Label" type="Label" parent="TalkWindow"]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 29.0
+offset_right = 990.0
+offset_bottom = 123.0
+label_settings = SubResource("LabelSettings_ca43x")
+autowrap_mode = 3
 
 [connection signal="pressed" from="TalkWindow/Button" to="." method="_on_button_pressed"]

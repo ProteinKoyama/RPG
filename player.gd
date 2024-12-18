@@ -8,10 +8,11 @@ var key_detected_flag = false
 
 func _ready():
 	screen_size = get_viewport_rect().size
+	print($"./Label".text)
 	
 func _process(delta):
 	var velocity = Vector2.ZERO
-	if !$"../MessageWindow".visible:
+	if !$"%MessageWindow".visible and !$"%MenuWindow/Panel".visible:
 		if Input.is_action_pressed("move_right"):
 			velocity.x += 1
 			$AnimationSprite2D.animation = "walk_right"
@@ -42,11 +43,6 @@ func _process(delta):
 	position += velocity * delta
 	position = position.clamp(Vector2.ZERO, screen_size)
 	velocity = move_and_slide()
-	if Input.is_action_pressed("interact") and !key_detected_flag:
-		$InteractTimer.start()
-		key_detected_flag = true
+	if Input.is_action_just_pressed("interact") and !key_detected_flag:
+		print("myself")
 	
-
-func _on_interact_timer_timeout() -> void:
-	if key_detected_flag:
-		key_detected_flag = false

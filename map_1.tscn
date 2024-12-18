@@ -1,37 +1,40 @@
-[gd_scene load_steps=8 format=3 uid="uid://kaeiaq1bkmck"]
+[gd_scene load_steps=6 format=3 uid="uid://kaeiaq1bkmck"]
 
 [ext_resource type="Script" path="res://map_1.gd" id="1_ukkl6"]
-[ext_resource type="PackedScene" uid="uid://cjk7od8f35142" path="res://message_window.tscn" id="1_w0ax5"]
-[ext_resource type="PackedScene" uid="uid://bk50j7ceajika" path="res://map.tscn" id="2_ejywa"]
-[ext_resource type="PackedScene" uid="uid://dxt4sxxfd3oup" path="res://player.tscn" id="4_8jrnp"]
-[ext_resource type="PackedScene" uid="uid://c38ogu73ftn1o" path="res://Myself.tscn" id="5_u6hem"]
+[ext_resource type="PackedScene" uid="uid://bk50j7ceajika" path="res://map1_map.tscn" id="2_ejywa"]
+[ext_resource type="PackedScene" uid="uid://c38ogu73ftn1o" path="res://myself.tscn" id="5_u6hem"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_huasj"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rur66"]
-size = Vector2(32, 28)
+size = Vector2(32, 47)
 
 [node name="Map1" type="Node"]
 script = ExtResource("1_ukkl6")
 
-[node name="MessageWindow" parent="." instance=ExtResource("1_w0ax5")]
-visible = false
+[node name="Map" parent="." instance=ExtResource("2_ejywa")]
 
-[node name="Maps" parent="." instance=ExtResource("2_ejywa")]
+[node name="Label" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
 
 [node name="Myself" parent="." instance=ExtResource("5_u6hem")]
-position = Vector2(255, 529)
+position = Vector2(331, 527)
 physics_material_override = SubResource("PhysicsMaterial_huasj")
 
-[node name="Player" parent="." instance=ExtResource("4_8jrnp")]
-position = Vector2(34, 585)
+[node name="Event0" type="Area2D" parent="."]
 
-[node name="Event" type="Area2D" parent="."]
-
-[node name="Event1" type="CollisionShape2D" parent="Event"]
-position = Vector2(169, 534)
+[node name="Event0" type="CollisionShape2D" parent="Event0"]
+position = Vector2(169, 543.5)
 shape = SubResource("RectangleShape2D_rur66")
 
-[connection signal="character_interacted_signal" from="Myself" to="MessageWindow" method="_on_myself_character_interacted_signal"]
-[connection signal="body_entered" from="Event" to="." method="_on_event_body_entered"]
-[connection signal="body_exited" from="Event" to="." method="_on_event_body_exited"]
+[node name="Event1" type="Area2D" parent="."]
+
+[node name="Event1" type="CollisionShape2D" parent="Event1"]
+position = Vector2(692, 536)
+shape = SubResource("RectangleShape2D_rur66")
+
+[connection signal="body_entered" from="Event0" to="." method="_on_event_body_entered"]
+[connection signal="body_exited" from="Event0" to="." method="_on_event_body_exited"]
+[connection signal="body_entered" from="Event1" to="." method="_on_event_2_body_entered"]
+[connection signal="body_exited" from="Event1" to="." method="_on_event_2_body_exited"]
