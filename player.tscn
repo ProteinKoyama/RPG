@@ -1,24 +1,61 @@
-[gd_scene load_steps=16 format=3 uid="uid://dxt4sxxfd3oup"]
+[gd_scene load_steps=17 format=3 uid="uid://dxt4sxxfd3oup"]
 
-[ext_resource type="Script" path="res://player.gd" id="1_en5um"]
-[ext_resource type="Texture2D" uid="uid://cftjpmsqxo038" path="res://assets/charachip/charatip_back.svg" id="2_06uaf"]
-[ext_resource type="Texture2D" uid="uid://b0kj8qjfh1r1u" path="res://assets/charachip/charatip_back_walk1.svg" id="3_j3ns6"]
-[ext_resource type="Texture2D" uid="uid://cksubr206la36" path="res://assets/charachip/charatip_back_walk2.svg" id="4_30xrf"]
-[ext_resource type="Texture2D" uid="uid://dd3xnmgwi8eju" path="res://assets/charachip/charatip_default.svg" id="5_sig6y"]
-[ext_resource type="Texture2D" uid="uid://cjyltk77kc08q" path="res://assets/charachip/charatip_left.svg" id="6_1sbqc"]
-[ext_resource type="Texture2D" uid="uid://564b0lmda532" path="res://assets/charachip/charatip_right.svg" id="7_fqm03"]
-[ext_resource type="Texture2D" uid="uid://ccok647edftqs" path="res://assets/charachip/charatip_walk1.svg" id="8_f25gf"]
-[ext_resource type="Texture2D" uid="uid://c10i5xniefe6g" path="res://assets/charachip/charatip_walk2.svg" id="9_bxdve"]
-[ext_resource type="Texture2D" uid="uid://cmhokhmpudk3k" path="res://assets/charachip/charatip_left_walk1.svg" id="10_c7fn1"]
-[ext_resource type="Texture2D" uid="uid://fwhdvlgpimyr" path="res://assets/charachip/charatip_left_walk2.svg" id="11_063j7"]
-[ext_resource type="Texture2D" uid="uid://ca3b5st8ibvb" path="res://assets/charachip/charatip_right_walk1.svg" id="12_6ulq1"]
-[ext_resource type="Texture2D" uid="uid://bgojykaykswc8" path="res://assets/charachip/charatip_right_walk2.svg" id="13_2t2dm"]
+[ext_resource type="Script" uid="uid://mrrx2405e5e1" path="res://player.gd" id="1_en5um"]
+[ext_resource type="Texture2D" uid="uid://da86jx5n2b36q" path="res://assets/charachip/Chara_Myself.png" id="2_w3hdw"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pmoy6"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(15, 60, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3x5rk"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(0, 60, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_47eni"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(30, 60, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5h5k8"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(15, 0, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d563t"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(15, 20, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a1cih"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(15, 40, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dgdab"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(0, 0, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a1gsu"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(30, 0, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0i2rm"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(0, 20, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3ygrc"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(30, 20, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pfnlg"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(0, 40, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q1qvg"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(30, 40, 15, 20)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_rqfxc"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_06uaf")
+"texture": SubResource("AtlasTexture_pmoy6")
 }],
 "loop": true,
 "name": &"back",
@@ -26,10 +63,10 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("3_j3ns6")
+"texture": SubResource("AtlasTexture_3x5rk")
 }, {
 "duration": 1.0,
-"texture": ExtResource("4_30xrf")
+"texture": SubResource("AtlasTexture_47eni")
 }],
 "loop": true,
 "name": &"back_walk",
@@ -37,7 +74,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("5_sig6y")
+"texture": SubResource("AtlasTexture_5h5k8")
 }],
 "loop": true,
 "name": &"default",
@@ -45,7 +82,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("6_1sbqc")
+"texture": SubResource("AtlasTexture_d563t")
 }],
 "loop": true,
 "name": &"left",
@@ -53,7 +90,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("7_fqm03")
+"texture": SubResource("AtlasTexture_a1cih")
 }],
 "loop": true,
 "name": &"right",
@@ -61,10 +98,10 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("8_f25gf")
+"texture": SubResource("AtlasTexture_dgdab")
 }, {
 "duration": 1.0,
-"texture": ExtResource("9_bxdve")
+"texture": SubResource("AtlasTexture_a1gsu")
 }],
 "loop": true,
 "name": &"walk_front",
@@ -72,10 +109,10 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("10_c7fn1")
+"texture": SubResource("AtlasTexture_0i2rm")
 }, {
 "duration": 1.0,
-"texture": ExtResource("11_063j7")
+"texture": SubResource("AtlasTexture_3ygrc")
 }],
 "loop": true,
 "name": &"walk_left",
@@ -83,10 +120,10 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("12_6ulq1")
+"texture": SubResource("AtlasTexture_pfnlg")
 }, {
 "duration": 1.0,
-"texture": ExtResource("13_2t2dm")
+"texture": SubResource("AtlasTexture_q1qvg")
 }],
 "loop": true,
 "name": &"walk_right",
@@ -97,6 +134,7 @@ animations = [{
 size = Vector2(420, 470)
 
 [node name="Player" type="CharacterBody2D"]
+z_index = 1
 scale = Vector2(0.12, 0.12)
 collision_mask = 2
 platform_wall_layers = 2
@@ -104,17 +142,16 @@ script = ExtResource("1_en5um")
 metadata/_edit_group_ = true
 
 [node name="AnimationSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-14.1667, 14.1667)
+scale = Vector2(20, 20)
 sprite_frames = SubResource("SpriteFrames_rqfxc")
-animation = &"walk_right"
+animation = &"walk_left"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 2
-position = Vector2(0, -5)
+position = Vector2(0, 20)
 shape = SubResource("RectangleShape2D_cjolb")
 
-[node name="Label" type="Label" parent="."]
-visible = false
-offset_right = 40.0
-offset_bottom = 23.0
-scale = Vector2(1e-05, 1e-05)
-text = "player:test"
+[node name="Camera2D" type="Camera2D" parent="."]
+position_smoothing_speed = 0.0

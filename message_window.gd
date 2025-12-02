@@ -3,43 +3,48 @@ extends CanvasLayer
 var char_name
 var full_text = ""
 var visible_text = ""
-var current_index = 0
+var dialog_index = 0
 var page_length = 100
 var window_open_flag = false
 
+var dialog = ["文章1","文章２文章２文章２文章２文章２","文章\n3"]
+
 func _ready() -> void:
 	self.hide()
-	visible_text = ""
-	current_index = 0
-	page_length = 100
-	full_text = $TalkWindow/Label.text
-
-func _process(delta: float) -> void:
-	if $TalkWindow/Label.text != "" and Input.is_action_just_pressed("interact"):
-		if !window_open_flag:
-			full_text = $TalkWindow/Label.text
-			window_open_flag = true
-		self.show()
-	$TalkWindow/Label.text = full_text.substr(current_index,page_length)
+	#visible_text = ""
+	#dialog_index = 0
+	#page_length = 100
+	#full_text = $TalkWindow/Label.text
+	$TalkWindow/Label.text = dialog[dialog_index]
 	if Input.is_action_just_pressed("talk"):
-		print($TalkWindow/Label.text,"process")
-		self.show()
-		show_page()
+		if dialog_index < dialog.size() - 1:
+			dialog_index += 1
+			update_dialog()
+		else:
+			pass
+func update_dialog():
+	$TalkWindow/Label.text = full_text.substr(dialog_index,page_length)
+func _process(delta: float) -> void:
+	$TalkWindow/Label.text = full_text.substr(dialog_index,page_length)
+	if Input.is_action_just_pressed("talk"):
+		if $TalkWindow/Label.text == "":
+			self.hide()
+		#show_page()
+	if Input.is_action_just_pressed("talk"):
+		if self.visible:
+			self.hide()
 	else:
 		$TalkWindow/HBoxContainer/TextureRect.texture = null
 		$TalkWindow/HBoxContainer/VBoxContainer/Label.text = ""
-		$TalkWindow/Label.text = full_text
-func show_page():
-	visible_text = full_text.substr(current_index,page_length)
-	$TalkWindow/Label.text = visible_text
-	current_index += page_length
-	if current_index >= full_text.length():
-		current_index = full_text.length()
-	if $TalkWindow/Label.text == "":
-		self.hide
-	print($TalkWindow/Label.text)
-func _on_button_pressed() -> void:
-	show_page()
+#func show_page():
+	#visible_text = full_text.substr(dialog_index,page_length)
+	#$TalkWindow/Label.text = visible_text
+	#dialog_index += page_length
+	#if dialog_index >= full_text.length():
+		#dialog_index = full_text.length()
+	#if $TalkWindow/Label.text == "":
+		#self.hide
+	#print($TalkWindow/Label.text)
 	
 func _on_myself_character_interacted_signal(body) -> void:
 	self.show()

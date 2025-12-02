@@ -1,12 +1,27 @@
-[gd_scene load_steps=6 format=3 uid="uid://c38ogu73ftn1o"]
+[gd_scene load_steps=8 format=3 uid="uid://c38ogu73ftn1o"]
 
 [ext_resource type="Script" path="res://characters.gd" id="1_odp06"]
-[ext_resource type="Texture2D" uid="uid://dd3xnmgwi8eju" path="res://assets/charachip/charatip_default.svg" id="2_m30es"]
+[ext_resource type="Texture2D" uid="uid://cp2c5q2cfxfow" path="res://assets/charachip/Chara_Romachang.png" id="2_vx0yi"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_huasj"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_e1idu"]
 size = Vector2(506.667, 650)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a0gg6"]
+atlas = ExtResource("2_vx0yi")
+region = Rect2(20, 0, 20, 20)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_u7x8o"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a0gg6")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x6g3i"]
 size = Vector2(158.333, 151.667)
@@ -25,8 +40,10 @@ metadata/_edit_group_ = true
 position = Vector2(0, 75)
 shape = SubResource("RectangleShape2D_e1idu")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_m30es")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(20, 20)
+sprite_frames = SubResource("SpriteFrames_u7x8o")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
 position = Vector2(0, -39.167)
