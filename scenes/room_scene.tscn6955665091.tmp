@@ -147,7 +147,7 @@ texture = ExtResource("1_jinkd")
 sources/0 = SubResource("TileSetAtlasSource_rgwj0")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_glo7x"]
-size = Vector2(147, 67)
+size = Vector2(147, 42)
 
 [node name="RoomScene" type="Node"]
 script = ExtResource("1_ueye4")
@@ -166,7 +166,7 @@ tile_set = SubResource("TileSet_ikw7k")
 position = Vector2(-49, 176)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Room/Area2D"]
-position = Vector2(523.5, 656.5)
+position = Vector2(523.5, 644)
 shape = SubResource("RectangleShape2D_glo7x")
 
 [node name="PlayerSpawnPoint" type="Marker2D" parent="."]

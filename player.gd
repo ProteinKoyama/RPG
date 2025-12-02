@@ -39,7 +39,7 @@ func _process(delta):
 		if character_directions == "back":
 			$AnimationSprite2D.animation = "back"
 	position += velocity * delta
-	position = position.clamp(Vector2.ZERO, screen_size)
+	#position = position.clamp(Vector2.ZERO, screen_size)
 	velocity = move_and_slide()
 	if Input.is_action_just_pressed("interact") and !key_detected_flag:
 		pass

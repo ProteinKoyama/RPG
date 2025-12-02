@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://c38ogu73ftn1o"]
 
-[ext_resource type="Script" path="res://characters.gd" id="1_odp06"]
+[ext_resource type="Script" uid="uid://bnvnfc0tu60ej" path="res://characters.gd" id="1_odp06"]
 [ext_resource type="Texture2D" uid="uid://cp2c5q2cfxfow" path="res://assets/charachip/Chara_Romachang.png" id="2_vx0yi"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_huasj"]
@@ -24,9 +24,9 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x6g3i"]
-size = Vector2(158.333, 151.667)
+size = Vector2(158.333, 290.0005)
 
-[node name="Myself" type="StaticBody2D"]
+[node name="Roma" type="StaticBody2D"]
 light_mask = 2
 scale = Vector2(0.12, 0.12)
 collision_layer = 2
@@ -46,15 +46,9 @@ scale = Vector2(20, 20)
 sprite_frames = SubResource("SpriteFrames_u7x8o")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
-position = Vector2(0, -39.167)
+position = Vector2(0, 29.999746)
+scale = Vector2(0.99999994, 0.99999994)
 shape = SubResource("RectangleShape2D_x6g3i")
-
-[node name="Label" type="Label" parent="."]
-visible = false
-offset_right = 40.0
-offset_bottom = 23.0
-scale = Vector2(1e-05, 1e-05)
-text = "こんにちは"
 
 [connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
 [connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]

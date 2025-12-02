@@ -131,7 +131,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cjolb"]
-size = Vector2(420, 470)
+size = Vector2(233.33334, 255)
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 1
@@ -150,7 +150,8 @@ animation = &"walk_left"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 2
-position = Vector2(0, 20)
+position = Vector2(-25, 127.49996)
+scale = Vector2(0.9999998, 0.9999998)
 shape = SubResource("RectangleShape2D_cjolb")
 
 [node name="Camera2D" type="Camera2D" parent="."]
