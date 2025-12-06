@@ -21,6 +21,7 @@ GameManager="*res://game_manager.gd"
 DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
 PlayerManager="*res://PlayerManager.gd"
 TransitionManager="*res://TransitionManager.gd"
+EventManager="*res://EventManager.gd"
 
 [display]
 

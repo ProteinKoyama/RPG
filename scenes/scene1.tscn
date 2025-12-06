@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=4 uid="uid://kaeiaq1bkmck"]
+[gd_scene load_steps=9 format=4 uid="uid://kaeiaq1bkmck"]
 
 [ext_resource type="Script" uid="uid://cftdiv11gd5ok" path="res://scenes/scene1.gd" id="1_q3myb"]
 [ext_resource type="Texture2D" uid="uid://c1brha4ikrgcv" path="res://assets/tile1.png" id="2_007yp"]
@@ -147,6 +147,9 @@ texture = ExtResource("2_007yp")
 [sub_resource type="TileSet" id="TileSet_s8jmr"]
 sources/0 = SubResource("TileSetAtlasSource_ogaks")
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_007yp"]
+size = Vector2(30, 48)
+
 [node name="Scene1" type="Node"]
 script = ExtResource("1_q3myb")
 
@@ -168,3 +171,11 @@ position = Vector2(101, 556)
 
 [node name="Roma" parent="." instance=ExtResource("3_dh1pk")]
 position = Vector2(198, 538.00006)
+
+[node name="ToMyRoom" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ToMyRoom"]
+position = Vector2(99, 521)
+shape = SubResource("RectangleShape2D_007yp")
+
+[connection signal="character_interacted_signal" from="Roma" to="." method="_on_roma_character_interacted_signal"]

@@ -172,4 +172,7 @@ shape = SubResource("RectangleShape2D_glo7x")
 [node name="PlayerSpawnPoint" type="Marker2D" parent="."]
 position = Vector2(590, 264)
 
+[node name="FromScene1" type="Marker2D" parent="."]
+position = Vector2(523, 586)
+
 [connection signal="body_entered" from="Room/Area2D" to="." method="_on_area_2d_body_entered"]

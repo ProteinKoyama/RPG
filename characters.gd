@@ -11,8 +11,9 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if char_in_area_flag:
-		if Input.is_action_pressed("interact"):
-			emit_signal("character_interacted_signal",self)
+		if Input.is_action_just_released("interact"):
+			#emit_signal("character_interacted_signal",self)
+			EventManager.message("test")
 func _on_area_2d_body_entered(body: Node2D) -> void:
 	char_in_area_flag = true
 	char_body = self

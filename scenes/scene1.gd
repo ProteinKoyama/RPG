@@ -9,3 +9,7 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if event_area_inside and Input.is_action_just_pressed("interact") and text_index >= 0:
 		print(%TalkPanel/Textbox)
+
+
+func _on_roma_character_interacted_signal() -> void:
+	$MessageWindow.visible()
