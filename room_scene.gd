@@ -1,13 +1,19 @@
 extends Node
-var game_scene1: PackedScene = preload("res://scenes/scene1.tscn")
-
+var DialogScene := preload("res://TextBox.tscn")
 func _ready() -> void:
 	PlayerManager.spawn_player($PlayerSpawnPoint.global_position)
-
+	EventManager.connect("request_show_dialog", Callable(self, "_on_request_show_dialog"))
+	
 func _process(_delta: float) -> void:
 	pass
 
-
 func _on_area_2d_body_entered(_body: Node2D) -> void:
-	#get_tree().change_scene_to_packed.call_deferred(game_scene1)
 	GameManager.transition_to_scene("res://scenes/scene1.tscn", "FromMyRoom")
+
+
+func _on_roma_character_interacted_signal(_body) -> void:
+	EventManager.message()
+	if !EventManager.dialog_visible: EventManager.show_dialog([])
+func _on_request_show_dialog(dialog_data):
+	var dialog = DialogScene.instantiate()
+	add_child(dialog)

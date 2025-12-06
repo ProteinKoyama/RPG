@@ -1,15 +1,14 @@
 extends Node
-var event_area_inside = false
-var text_index = -1
-signal interact
-var text_array = ["E:調べる , Z or Space:テキスト送り/決定\nEsc:メニュー/キャンセル",
-"ここは病院です"]
+
 func _ready() -> void:
+	print("scene1")
 	pass
 func _process(_delta: float) -> void:
-	if event_area_inside and Input.is_action_just_pressed("interact") and text_index >= 0:
-		print(%TalkPanel/Textbox)
+	pass
 
 
-func _on_roma_character_interacted_signal() -> void:
-	$MessageWindow.visible()
+func _on_to_my_room_area_entered(area: Area2D) -> void:
+	print("test")
+	if Input.is_action_pressed("interact"):
+		print("test2")
+		GameManager.transition_to_scene("res://scenes/room_scene.tscn", "FromScene1")

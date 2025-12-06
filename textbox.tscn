@@ -1,63 +1,67 @@
 [gd_scene load_steps=5 format=3 uid="uid://cjk7od8f35142"]
 
-[ext_resource type="Script" uid="uid://r558ppjv73pl" path="res://textbox.gd" id="1_m7647"]
+[ext_resource type="Script" uid="uid://wyu7e3x6ynks" path="res://text_box.gd" id="1_1u4do"]
 
-[sub_resource type="Theme" id="Theme_jglfy"]
+[sub_resource type="Theme" id="Theme_us7u2"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_v3frn"]
+[sub_resource type="LabelSettings" id="LabelSettings_vng66"]
 font_size = 32
 
-[sub_resource type="LabelSettings" id="LabelSettings_2fpce"]
+[sub_resource type="LabelSettings" id="LabelSettings_ptcjm"]
 font_size = 32
 
-[node name="Textbox" type="Control"]
-layout_mode = 3
-anchors_preset = 0
-script = ExtResource("1_m7647")
-
-[node name="TalkPanel" type="Panel" parent="."]
+[node name="Textbox" type="Panel"]
 unique_name_in_owner = true
-layout_mode = 1
+z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 157.0
-offset_top = 509.0
-offset_right = 1157.0
-offset_bottom = 676.0
+offset_left = -500.0
+offset_top = 145.0
+offset_right = 500.0
+offset_bottom = 312.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource("Theme_jglfy")
+theme = SubResource("Theme_us7u2")
+script = ExtResource("1_1u4do")
 
 [node name="Name" type="Label" parent="."]
 layout_mode = 0
-offset_left = 171.0
-offset_top = 519.0
-offset_right = 289.0
-offset_bottom = 564.0
+offset_left = 22.0
+offset_top = 1.0
+offset_right = 83.0
+offset_bottom = 46.0
 text = "text"
-label_settings = SubResource("LabelSettings_v3frn")
+label_settings = SubResource("LabelSettings_vng66")
 
 [node name="Dialog" type="Label" parent="."]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 0.020000001
-anchor_bottom = 0.069000006
-offset_left = 186.0
-offset_top = 553.0
-offset_right = 1112.0
-offset_bottom = 642.477
+layout_mode = 0
+offset_left = 22.0
+offset_top = 50.0
+offset_right = 83.0
+offset_bottom = 95.0
 text = "text"
-label_settings = SubResource("LabelSettings_2fpce")
+label_settings = SubResource("LabelSettings_ptcjm")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 15.0
+offset_right = 83.0
+offset_bottom = 109.0
 
 [node name="IngameMenu" type="Control" parent="."]
 anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = -157.0
+offset_top = -509.0
+offset_right = -117.0
+offset_bottom = -469.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="IngameMenu"]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 597.0
+offset_top = 253.0
+offset_right = 637.0
+offset_bottom = 293.0

@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=4 uid="uid://bwarfbif7soh6"]
+[gd_scene load_steps=9 format=4 uid="uid://bwarfbif7soh6"]
 
 [ext_resource type="Texture2D" uid="uid://c1brha4ikrgcv" path="res://assets/tile1.png" id="1_jinkd"]
 [ext_resource type="Script" uid="uid://bgel4olso2gvl" path="res://room_scene.gd" id="1_ueye4"]
+[ext_resource type="PackedScene" uid="uid://c38ogu73ftn1o" path="res://roma.tscn" id="3_g3etw"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jqbpo"]
 texture = ExtResource("1_jinkd")
@@ -175,4 +176,8 @@ position = Vector2(590, 264)
 [node name="FromScene1" type="Marker2D" parent="."]
 position = Vector2(523, 586)
 
+[node name="Roma" parent="." instance=ExtResource("3_g3etw")]
+position = Vector2(708.99994, 308.99997)
+
 [connection signal="body_entered" from="Room/Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="character_interacted_signal" from="Roma" to="." method="_on_roma_character_interacted_signal"]

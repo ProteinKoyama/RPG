@@ -1,14 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://bgvi3n5rd5hpi"]
+[gd_scene load_steps=3 format=3 uid="uid://bgvi3n5rd5hpi"]
 
 [ext_resource type="Script" uid="uid://m0xo38de0boq" path="res://main.gd" id="1_niqmn"]
-[ext_resource type="PackedScene" uid="uid://cjk7od8f35142" path="res://textbox.tscn" id="3_h2yge"]
 [ext_resource type="PackedScene" uid="uid://646qglchrkit" path="res://menu_window.tscn" id="5_tek36"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_niqmn")
 
 [node name="MenuWindow" parent="." instance=ExtResource("5_tek36")]
-unique_name_in_owner = true
-
-[node name="Textbox" parent="." instance=ExtResource("3_h2yge")]
 unique_name_in_owner = true
