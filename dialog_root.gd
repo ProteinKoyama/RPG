@@ -26,7 +26,6 @@ func _process(_delta):
 func _input(event: InputEvent) -> void:
 	if Input.is_action_just_released("interact") and !visible_flag:
 		if index >= dialog.size():
-			
 			visible_flag = true
 			print(index,visible_flag)
 			queue_free()
