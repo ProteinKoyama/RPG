@@ -1,0 +1,159 @@
+[gd_scene load_steps=17 format=3 uid="uid://dxt4sxxfd3oup"]
+
+[ext_resource type="Script" uid="uid://mrrx2405e5e1" path="res://player.gd" id="1_en5um"]
+[ext_resource type="Texture2D" uid="uid://da86jx5n2b36q" path="res://assets/charachip/Chara_Myself.png" id="2_w3hdw"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pmoy6"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(15, 60, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3x5rk"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(0, 60, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_47eni"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(30, 60, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5h5k8"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(15, 0, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d563t"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(15, 20, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a1cih"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(15, 40, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dgdab"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(0, 0, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a1gsu"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(30, 0, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0i2rm"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(0, 20, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3ygrc"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(30, 20, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pfnlg"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(0, 40, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q1qvg"]
+atlas = ExtResource("2_w3hdw")
+region = Rect2(30, 40, 15, 20)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_rqfxc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pmoy6")
+}],
+"loop": true,
+"name": &"back",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3x5rk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_47eni")
+}],
+"loop": true,
+"name": &"back_walk",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5h5k8")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d563t")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a1cih")
+}],
+"loop": true,
+"name": &"right",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dgdab")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a1gsu")
+}],
+"loop": true,
+"name": &"walk_front",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0i2rm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3ygrc")
+}],
+"loop": true,
+"name": &"walk_left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pfnlg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q1qvg")
+}],
+"loop": true,
+"name": &"walk_right",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cjolb"]
+size = Vector2(233.33334, 255)
+
+[node name="Player" type="CharacterBody2D"]
+z_index = 1
+scale = Vector2(0.12, 0.12)
+collision_mask = 2
+platform_wall_layers = 2
+script = ExtResource("1_en5um")
+speed = null
+metadata/_edit_group_ = true
+
+[node name="AnimationSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-14.1667, 14.1667)
+scale = Vector2(20, 20)
+sprite_frames = SubResource("SpriteFrames_rqfxc")
+animation = &"walk_left"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 2
+position = Vector2(-25, 127.49996)
+scale = Vector2(0.9999998, 0.9999998)
+shape = SubResource("RectangleShape2D_cjolb")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position_smoothing_speed = 0.0
