@@ -13,7 +13,10 @@ func _on_area_2d_body_entered(_body: Node2D) -> void:
 
 func _on_roma_character_interacted_signal(_body) -> void:
 	#EventManager.message()
-	if !EventManager.dialog_visible("DialogRoot"): EventManager.show_dialog([])
+	print("call:",EventManager.dialog_visible)
+	if !EventManager.dialog_visible:
+		EventManager.show_dialog([])
+
 func _on_request_show_dialog(dialog_data):
 	var dialog = DialogScene.instantiate()
 	add_child(dialog)

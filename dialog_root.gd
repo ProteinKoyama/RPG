@@ -5,16 +5,16 @@ var tmp_branch = 0
 @onready var dialog_label := $Textbox/Dialog
 @onready var ingame_menu := $Textbox/IngameMenu
 @onready var menu_conatainer := $Textbox/VBoxContainer
-var visible_flag = false
+
 const dialog =[
 		["name","HelloWorld!"],
+		["%s","testtexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttext"],
 		#["CallMenuCommand",["yes","no"]],
 		#["BranchCommand",[["1","選択肢1が選ばれました"],["2","選択肢2が選ばれました"]]],
 		["%s","会話終了"]
 	]
-var index = 0
+var index := 0
 func _ready():
-	index = 1
 	name_label.text = dialog[0][0]
 	dialog_label.text = dialog[0][1]
 	dialog_label.visible_ratio = 0
@@ -24,12 +24,11 @@ func _process(_delta):
 		dialog_label.visible_ratio += 1.0 / dialog_label.text.length() * (1.0 - duration)
 
 func _input(event: InputEvent) -> void:
-	if Input.is_action_just_released("interact") and !visible_flag:
-		if index >= dialog.size():
-			visible_flag = true
-			print(index,visible_flag)
+	if Input.is_action_just_released("interact"):
+		index += 1
+		if index >= dialog.size() :
+			#EventManager.dialog_closed()
 			queue_free()
-			
 			return
 		if dialog[index][0] == "CallMenuCommand" or dialog[index][0] == "BranchCommand":
 			if dialog[index][0] == "CallMenuCommand":
@@ -50,10 +49,9 @@ func _input(event: InputEvent) -> void:
 			name_label.text = dialog[index][0]
 			dialog_label.text = dialog[index][1]
 			if index < len(dialog) :
-				index+=1
-			else :pass
+				pass#index+=1
 			dialog_label.visible_ratio = 0
-			
+
 func _on_ingame_menu_button_pressed(i,item):
 	tmp_branch = i
 	ingame_menu.hide()
