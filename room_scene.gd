@@ -10,13 +10,19 @@ func _process(_delta: float) -> void:
 func _on_area_2d_body_entered(_body: Node2D) -> void:
 	GameManager.transition_to_scene("res://scenes/scene1.tscn", "FromMyRoom")
 
+var interacting:= false
 
 func _on_roma_character_interacted_signal(_body) -> void:
-	#EventManager.message()
-	print("call:",EventManager.dialog_visible)
+	if interacting and !EventManager.dialog_visible:
+		interacting = false
+		return
+	if interacting:
+		return
+	interacting = true
 	if !EventManager.dialog_visible:
-		EventManager.show_dialog([])
+		EventManager.show_dialog([["roma","test"]])
 
 func _on_request_show_dialog(dialog_data):
+	EventManager.dialog_manager_data = dialog_data
 	var dialog = DialogScene.instantiate()
 	add_child(dialog)

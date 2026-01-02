@@ -5,16 +5,18 @@ var tmp_branch = 0
 @onready var dialog_label := $Textbox/Dialog
 @onready var ingame_menu := $Textbox/IngameMenu
 @onready var menu_conatainer := $Textbox/VBoxContainer
-
-const dialog =[
-		["name","HelloWorld!"],
-		["%s","testtexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttext"],
+var dialog = EventManager.dialog_manager_data
+const tmp_dialog = [
+		["name","データが入力されていません"],
 		#["CallMenuCommand",["yes","no"]],
 		#["BranchCommand",[["1","選択肢1が選ばれました"],["2","選択肢2が選ばれました"]]],
 		["%s","会話終了"]
 	]
 var index := 0
 func _ready():
+	EventManager.dialog_manager_data = null
+	if !dialog:
+		dialog = tmp_dialog
 	name_label.text = dialog[0][0]
 	dialog_label.text = dialog[0][1]
 	dialog_label.visible_ratio = 0
@@ -27,7 +29,7 @@ func _input(event: InputEvent) -> void:
 	if Input.is_action_just_released("interact"):
 		index += 1
 		if index >= dialog.size() :
-			#EventManager.dialog_closed()
+			EventManager.dialog_closed()
 			queue_free()
 			return
 		if dialog[index][0] == "CallMenuCommand" or dialog[index][0] == "BranchCommand":
