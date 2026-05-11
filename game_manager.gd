@@ -6,7 +6,7 @@ var next_scene_path: String = ""
 
 func _ready() -> void:
 	get_tree().connect("scene_changed", Callable(self, "_on_scene_changed"))
-
+	PartyManager.setup_party()
 func transition_to_scene(scene_path:String, spawn_position_name:String) -> void:
 	await TransitionManager.fade_out(0.2)
 	next_scene_path = scene_path

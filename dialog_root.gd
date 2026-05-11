@@ -5,7 +5,8 @@ var tmp_branch = 0
 @onready var dialog_label := $Textbox/Dialog
 @onready var ingame_menu := $Textbox/IngameMenu
 @onready var menu_conatainer := $Textbox/VBoxContainer
-var dialog = EventManager.dialog_manager_data
+var dialog
+signal dialog_finished(result)
 const tmp_dialog = [
 		["name","データが入力されていません"],
 		#["CallMenuCommand",["yes","no"]],
@@ -14,8 +15,9 @@ const tmp_dialog = [
 	]
 var index := 0
 func _ready():
-	EventManager.dialog_manager_data = null
-	if !dialog:
+	if EventManager.dialog_manager_data != null:
+		dialog = EventManager.dialog_manager_data
+	else:
 		dialog = tmp_dialog
 	name_label.text = dialog[0][0]
 	dialog_label.text = dialog[0][1]
@@ -30,6 +32,7 @@ func _input(event: InputEvent) -> void:
 		index += 1
 		if index >= dialog.size() :
 			EventManager.dialog_closed()
+			dialog_finished.emit()
 			queue_free()
 			return
 		if dialog[index][0] == "CallMenuCommand" or dialog[index][0] == "BranchCommand":
@@ -58,3 +61,5 @@ func _on_ingame_menu_button_pressed(i,item):
 	tmp_branch = i
 	ingame_menu.hide()
 	index+=1
+func _exit_tree():
+	EventManager.dialog_visible = false

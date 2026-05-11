@@ -11,7 +11,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if char_in_area_flag:
-		if Input.is_action_just_released("interact"):
+		if Input.is_action_just_released("interact") and PlayerManager.can_move:
 			emit_signal("character_interacted_signal",self)
 			
 func _on_area_2d_body_entered(body: Node2D) -> void:

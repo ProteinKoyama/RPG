@@ -1,15 +1,15 @@
 extends Node
 var DialogScene := preload("res://DialogRoot.tscn")
+var BattleScene := preload("res://BattleScene.tscn")
+var is_battle
 func _ready() -> void:
 	PlayerManager.spawn_player($PlayerSpawnPoint.global_position)
 	EventManager.connect("request_show_dialog", Callable(self, "_on_request_show_dialog"))
-	
 func _process(_delta: float) -> void:
 	pass
 
 func _on_area_2d_body_entered(_body: Node2D) -> void:
 	GameManager.transition_to_scene("res://scenes/scene1.tscn", "FromMyRoom")
-
 var interacting:= false
 
 func _on_roma_character_interacted_signal(_body) -> void:
@@ -20,9 +20,16 @@ func _on_roma_character_interacted_signal(_body) -> void:
 		return
 	interacting = true
 	if !EventManager.dialog_visible:
-		EventManager.show_dialog([["roma","test"]])
-
+		is_battle = EventManager.show_dialog([["roma","test"]],"battle")
+		
 func _on_request_show_dialog(dialog_data):
 	EventManager.dialog_manager_data = dialog_data
 	var dialog = DialogScene.instantiate()
+	dialog.dialog_finished.connect(_on_dialog_finished)
 	add_child(dialog)
+func _on_dialog_finished():
+	print(is_battle)
+	if is_battle == "battle":
+		EventManager.start_battle(["slime,slime"])
+	else:
+		pass

@@ -2,6 +2,8 @@ extends Node
 
 var player_scene := preload("res://player.tscn")
 var player_instance: Node2D
+var player = null
+var can_move = true
 
 func spawn_player(pos: Vector2):
 	if player_instance == null:

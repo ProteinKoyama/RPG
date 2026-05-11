@@ -1,0 +1,96 @@
+[gd_scene load_steps=3 format=3 uid="uid://dre6j4ioo1ck6"]
+
+[ext_resource type="Script" uid="uid://di6yitqroijn2" path="res://battle_scene.gd" id="1_b278l"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_r5l0u"]
+font_size = 24
+
+[node name="BattleScene" type="Node"]
+script = ExtResource("1_b278l")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="EnemyInfoContainer" type="VBoxContainer" parent="UI"]
+offset_left = 466.0
+offset_top = 108.0
+offset_right = 810.0
+offset_bottom = 451.0
+
+[node name="Sprite2D" type="Sprite2D" parent="UI/EnemyInfoContainer"]
+
+[node name="NameLabel" type="Label" parent="UI/EnemyInfoContainer"]
+layout_mode = 2
+text = "enemy"
+horizontal_alignment = 1
+
+[node name="CommandWindow" type="Panel" parent="UI"]
+layout_direction = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1283.0
+offset_top = -234.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="PartyContainer" type="HBoxContainer" parent="UI/CommandWindow"]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -429.0
+offset_top = -108.5
+offset_bottom = 108.5
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI"]
+offset_left = -63.0
+offset_top = -108.0
+offset_right = 1350.0
+offset_bottom = 813.0
+color = Color(0, 0, 0, 0.3764706)
+
+[node name="MainCommands" type="VBoxContainer" parent="UI"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -29.0
+offset_top = -33.0
+offset_right = 29.0
+offset_bottom = 33.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="FightButton" type="Button" parent="UI/MainCommands"]
+layout_mode = 2
+text = "たたかう"
+
+[node name="EscapeButton" type="Button" parent="UI/MainCommands"]
+layout_mode = 2
+text = "逃げる"
+
+[node name="MessageWindow" type="Panel" parent="UI"]
+offset_left = 28.0
+offset_top = 533.0
+offset_right = 812.0
+offset_bottom = 678.0
+
+[node name="Label" type="Label" parent="UI/MessageWindow"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 775.0
+offset_bottom = 138.0
+label_settings = SubResource("LabelSettings_r5l0u")
+
+[connection signal="pressed" from="UI/MainCommands/FightButton" to="." method="_on_fight_button_pressed"]
+[connection signal="pressed" from="UI/MainCommands/EscapeButton" to="." method="_on_escape_button_pressed"]

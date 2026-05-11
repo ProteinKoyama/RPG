@@ -5,12 +5,14 @@ var screen_size
 var character_size= Vector2.ZERO
 var character_directions:String
 var key_detected_flag = false
-
+var can_move = PlayerManager.can_move
 func _ready():
 	screen_size = get_viewport_rect().size
+
 func _process(delta):
 	var velocity = Vector2.ZERO
-	if !EventManager.dialog_visible:
+	can_move = PlayerManager.can_move
+	if can_move:
 		if Input.is_action_pressed("move_right"):
 			velocity.x += 1
 			$AnimationSprite2D.animation = "walk_right"

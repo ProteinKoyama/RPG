@@ -1,0 +1,60 @@
+[gd_scene load_steps=2 format=3 uid="uid://cvdsvwcfvooh5"]
+
+[ext_resource type="Script" uid="uid://bbr0a4i5iu2ce" path="res://party_status.gd" id="1_vo5t0"]
+
+[node name="PartyStatus" type="Control"]
+custom_minimum_size = Vector2(100, 0)
+layout_direction = 2
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vo5t0")
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 0
+offset_right = 72.0
+offset_bottom = 23.0
+text = "player"
+
+[node name="StatusBars" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_top = 27.0
+offset_right = 72.0
+offset_bottom = 77.0
+
+[node name="HPText" type="Label" parent="StatusBars"]
+layout_mode = 2
+text = "0"
+
+[node name="SPText" type="Label" parent="StatusBars"]
+layout_mode = 2
+text = "0"
+
+[node name="ActionCommands" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_top = 81.0
+offset_right = 72.0
+offset_bottom = 217.0
+size_flags_stretch_ratio = 0.0
+
+[node name="AttackButton" type="Button" parent="ActionCommands"]
+layout_mode = 2
+text = "通常攻撃"
+
+[node name="SkillButton" type="Button" parent="ActionCommands"]
+layout_mode = 2
+text = "特技"
+
+[node name="DeffenceButton" type="Button" parent="ActionCommands"]
+layout_mode = 2
+text = "防御"
+
+[node name="ItemButton" type="Button" parent="ActionCommands"]
+layout_mode = 2
+text = "アイテム"
+
+[connection signal="pressed" from="ActionCommands/AttackButton" to="." method="_on_attack_button_pressed"]
+[connection signal="pressed" from="ActionCommands/DeffenceButton" to="." method="_on_deffence_button_pressed"]

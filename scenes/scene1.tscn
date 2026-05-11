@@ -148,7 +148,7 @@ texture = ExtResource("2_007yp")
 sources/0 = SubResource("TileSetAtlasSource_ogaks")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_007yp"]
-size = Vector2(49, 46)
+size = Vector2(49, 89)
 
 [node name="Scene1" type="Node"]
 script = ExtResource("1_q3myb")
@@ -169,14 +169,15 @@ tile_set = SubResource("TileSet_s8jmr")
 [node name="FromMyRoom" type="Marker2D" parent="."]
 position = Vector2(101, 556)
 
-[node name="Roma" parent="." instance=ExtResource("3_dh1pk")]
-position = Vector2(198, 538.00006)
-
 [node name="ToMyRoom" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ToMyRoom"]
-position = Vector2(99.5, 520)
+position = Vector2(99.5, 541.5)
 shape = SubResource("RectangleShape2D_007yp")
 
+[node name="Roma" parent="." instance=ExtResource("3_dh1pk")]
+position = Vector2(198, 538.00006)
+
+[connection signal="body_entered" from="ToMyRoom" to="." method="_on_to_my_room_body_entered"]
+[connection signal="body_exited" from="ToMyRoom" to="." method="_on_to_my_room_body_exited"]
 [connection signal="character_interacted_signal" from="Roma" to="." method="_on_roma_character_interacted_signal"]
-[connection signal="area_entered" from="ToMyRoom" to="." method="_on_to_my_room_area_entered"]
