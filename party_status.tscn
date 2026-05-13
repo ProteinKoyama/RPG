@@ -48,7 +48,7 @@ text = "通常攻撃"
 layout_mode = 2
 text = "特技"
 
-[node name="DeffenceButton" type="Button" parent="ActionCommands"]
+[node name="DefenseButton" type="Button" parent="ActionCommands"]
 layout_mode = 2
 text = "防御"
 
@@ -57,4 +57,4 @@ layout_mode = 2
 text = "アイテム"
 
 [connection signal="pressed" from="ActionCommands/AttackButton" to="." method="_on_attack_button_pressed"]
-[connection signal="pressed" from="ActionCommands/DeffenceButton" to="." method="_on_deffence_button_pressed"]
+[connection signal="pressed" from="ActionCommands/DefenseButton" to="." method="_on_defense_button_pressed"]

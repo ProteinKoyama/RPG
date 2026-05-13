@@ -1,0 +1,16 @@
+{
+	"girl":{
+		"name":"少女",
+		"hp":100,
+		"attack":30,
+		"defense":20,
+		"speed":20
+	},
+	"moeko":{
+		"name":"モエ子",
+		"hp":80,
+		"attack":10,
+		"defense":10,
+		"speed":30,
+	}
+}

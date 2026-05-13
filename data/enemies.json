@@ -3,13 +3,16 @@
 		"name": "スライム",
 		"hp": 30,
 		"attack": 5,
-		"speed": 3
+		"defense": 0,
+		"speed": 3,
+		"image": "assets/pictures/slime.png"
 	},
 
 	"shadow": {
-		"name": "シャドウ",
-		"hp": 100,
+		"name": "影",
+		"hp": 90,
 		"attack": 20,
+		"defense": 10,
 		"speed": 15
 	}
 }

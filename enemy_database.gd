@@ -12,4 +12,4 @@ func load_enemy_data():
 	var text = file.get_as_text()
 	enemies = JSON.parse_string(text)
 func get_enemy_data(id):
-	return enemies
+	return enemies[id]

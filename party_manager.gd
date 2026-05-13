@@ -1,30 +1,34 @@
 extends Node
 
 var party_members = []
+var characters = {}
 
 func _ready():
-	pass
-
+	load_character_database()
+func load_character_database():
+	var file = FileAccess.open(
+		"res://data/player_characters.json",
+		FileAccess.READ
+	)
+	var text = file.get_as_text()
+	characters = JSON.parse_string(text)
 func setup_party():
-	party_members.clear()
-	var hero = Character.new({
-		"name":"勇者",
-		"hp":100,
-		"attack":20,
-		"speed":10
-	})
-	var hello = Character.new({
-		"name":"偽勇者",
-		"hp":100,
-		"attack":20,
-		"speed":10
-	})
-	party_members.append(hero)
-	party_members.append(hello)
-	print("party setup")
+	pass
 func get_party():
 	return party_members
-func add_member(character):
-	party_members.append(character)
+func add_member(character_id):
+	if !characters.has(character_id):
+		print("character not found:", character_id)
+		return
+	party_members.append(
+		Character.new(characters[character_id])
+	)
 func remove_member(character):
 	party_members.erase(character)
+func heal_all_full():
+	for member in party_members:
+		member.heal_full()
+
+func set_all_hp_one():
+	for member in party_members:
+		member.set_hp_one()

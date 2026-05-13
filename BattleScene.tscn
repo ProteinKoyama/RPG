@@ -10,18 +10,13 @@ script = ExtResource("1_b278l")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="EnemyInfoContainer" type="VBoxContainer" parent="UI"]
-offset_left = 466.0
-offset_top = 108.0
-offset_right = 810.0
-offset_bottom = 451.0
-
-[node name="Sprite2D" type="Sprite2D" parent="UI/EnemyInfoContainer"]
-
-[node name="NameLabel" type="Label" parent="UI/EnemyInfoContainer"]
-layout_mode = 2
-text = "enemy"
-horizontal_alignment = 1
+[node name="EnemyArea" type="Control" parent="UI"]
+layout_mode = 3
+anchor_bottom = 0.5
+offset_top = 134.0
+offset_right = 1270.0
+offset_bottom = 94.0
+grow_horizontal = 2
 
 [node name="CommandWindow" type="Panel" parent="UI"]
 layout_direction = 3

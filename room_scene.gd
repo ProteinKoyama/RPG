@@ -3,6 +3,10 @@ var DialogScene := preload("res://DialogRoot.tscn")
 var BattleScene := preload("res://BattleScene.tscn")
 var is_battle
 func _ready() -> void:
+	if !EventManager.opening_done:
+		PartyManager.add_member("girl")
+		EventManager.opening_done = true
+	else: pass
 	PlayerManager.spawn_player($PlayerSpawnPoint.global_position)
 	EventManager.connect("request_show_dialog", Callable(self, "_on_request_show_dialog"))
 func _process(_delta: float) -> void:
@@ -30,6 +34,6 @@ func _on_request_show_dialog(dialog_data):
 func _on_dialog_finished():
 	print(is_battle)
 	if is_battle == "battle":
-		EventManager.start_battle(["slime,slime"])
+		EventManager.start_battle(["slime","slime"])
 	else:
 		pass
