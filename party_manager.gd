@@ -20,9 +20,15 @@ func add_member(character_id):
 	if !characters.has(character_id):
 		print("character not found:", character_id)
 		return
+	for member in party_members:
+		if member.char_id == character_id:
+			print("already joined:", character_id)
+			return
 	party_members.append(
 		Character.new(characters[character_id])
 	)
+	print("member added")
+	print(party_members)
 func remove_member(character):
 	party_members.erase(character)
 func heal_all_full():

@@ -47,10 +47,6 @@ func setup(enemy):
 	is_dying = false
 
 func _unhandled_input(event):
-	if !has_focus():
-		return
-	if !target_select_enabled:
-		return
 	if event.is_action_pressed("ui_accept"):
 		target_selected.emit(enemy_ref)
 		get_viewport().set_input_as_handled()

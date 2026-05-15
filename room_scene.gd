@@ -14,6 +14,7 @@ func _process(_delta: float) -> void:
 
 func _on_area_2d_body_entered(_body: Node2D) -> void:
 	GameManager.transition_to_scene("res://scenes/scene1.tscn", "FromMyRoom")
+	EventManager.request_show_dialog.connect(_on_request_show_dialog)
 var interacting:= false
 
 func _on_roma_character_interacted_signal(_body) -> void:
@@ -27,12 +28,10 @@ func _on_roma_character_interacted_signal(_body) -> void:
 		is_battle = EventManager.show_dialog([["roma","test"]],"battle")
 		
 func _on_request_show_dialog(dialog_data):
-	EventManager.dialog_manager_data = dialog_data
 	var dialog = DialogScene.instantiate()
 	dialog.dialog_finished.connect(_on_dialog_finished)
-	add_child(dialog)
+	
 func _on_dialog_finished():
-	print(is_battle)
 	if is_battle == "battle":
 		EventManager.start_battle(["slime","slime"])
 	else:

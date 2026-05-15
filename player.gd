@@ -45,3 +45,17 @@ func _process(delta):
 	velocity = move_and_slide()
 	if Input.is_action_just_pressed("interact") and !key_detected_flag:
 		pass
+func _unhandled_input(event):
+	if PlayerManager.in_battle:
+		return
+	if MenuManager.is_menu_open():
+		return
+	if event.is_action_pressed("menu"):
+		if MenuManager.is_menu_open():
+			return
+		if event.is_action_pressed("menu"):
+			MenuManager.open_menu()
+			get_viewport().set_input_as_handled()
+		if PlayerManager.can_move:
+			MenuManager.open_menu()
+			get_viewport().set_input_as_handled()

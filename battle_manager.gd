@@ -24,6 +24,7 @@ func _ready() -> void:
 	EventManager.battle_requested.connect(_on_battle_requested)
 	
 func start_battle(enemy_ids:Array):
+	PlayerManager.in_battle = true
 	var scene = preload("res://BattleScene.tscn")
 	battle_scene = scene.instantiate()
 	battle_scene.member_action_selected.connect(_on_member_action_selected)
@@ -50,8 +51,10 @@ func handle_main_command(action):
 		"fight":
 			state = BattleState.ACTION_SELECT
 			battle_scene.show_action_commands()
+			await get_tree().process_frame
 			begin_command_select()
 		"escape":
+			state = BattleState.END
 			end_battle("escape")
 func begin_command_select():
 	selected_actions.clear()
@@ -111,7 +114,7 @@ func execute_turn():
 					print(target.char_name,"damage:",damage,"HP:",target.hp,"/",target.max_hp)
 					await battle_scene.show_message(target.char_name+" に "+str(damage)+" ダメージ！")
 				"defense":
-					character.start_defence()
+					character.start_defense()
 					await battle_scene.show_message(character.char_name + " は防御している！")
 # 敵ターン
 		elif enemies.has(character):
@@ -179,6 +182,7 @@ func get_first_alive_party_member():
 func end_battle(result : String):
 	print(result)
 	PlayerManager.can_move = true
+	PlayerManager.in_battle = false
 	get_viewport().gui_release_focus()
 	match result:
 		"win":

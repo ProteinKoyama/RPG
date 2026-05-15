@@ -1,0 +1,33 @@
+[gd_scene load_steps=6 format=3 uid="uid://bixgx6is1r0ad"]
+
+[ext_resource type="Script" uid="uid://bgqcj5rgps2tg" path="res://npc.gd" id="1_xxcha"]
+[ext_resource type="Resource" uid="uid://cnljyilgxdwof" path="res://tres/moeko.tres" id="2_ul7y6"]
+[ext_resource type="Texture2D" uid="uid://c1o76mhjglfq6" path="res://assets/charachip/Chara_doctor_common.png" id="3_kh24r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ul7y6"]
+size = Vector2(506.667, 650)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mcvl2"]
+size = Vector2(158.333, 290.0005)
+
+[node name="NPC" type="Area2D"]
+script = ExtResource("1_xxcha")
+data = ExtResource("2_ul7y6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 75)
+shape = SubResource("RectangleShape2D_ul7y6")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(15, 15)
+texture = ExtResource("3_kh24r")
+region_rect = Rect2(23.329048, 0.09615803, 13.166557, 18.911968)
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+position = Vector2(0, 29.999746)
+scale = Vector2(0.99999994, 0.99999994)
+shape = SubResource("RectangleShape2D_mcvl2")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

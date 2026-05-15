@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://da86jx5n2b36q"
-path="res://.godot/imported/Chara_Myself.png-4486f68632f9a1e42bad794fdac201ab.ctex"
+uid="uid://d4ld76sieym1s"
+path="res://.godot/imported/Chara_idol.png-7f290c99eb6d1ed846d743b4c5e180a3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/charachip/Chara_Myself.png"
-dest_files=["res://.godot/imported/Chara_Myself.png-4486f68632f9a1e42bad794fdac201ab.ctex"]
+source_file="res://assets/charachip/Chara_idol.png"
+dest_files=["res://.godot/imported/Chara_idol.png-7f290c99eb6d1ed846d743b4c5e180a3.ctex"]
 
 [params]
 

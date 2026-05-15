@@ -2,6 +2,7 @@ extends Node
 @onready var battle_dialog := $UI/MessageWindow/Label
 @onready var main_commands := $UI/MainCommands
 @onready var fight_button := $UI/MainCommands/FightButton
+@onready var escape_button := $UI/MainCommands/EscapeButton
 @onready var party_container = $UI/CommandWindow/PartyContainer
 @onready var color_rect = $UI/ColorRect
 @onready var enemy_area = $UI/EnemyArea
@@ -18,8 +19,8 @@ signal enemy_target_selected(enemy)
 var messages = BattleManager.messages
 
 func _ready() -> void:
-	EventManager.battle_requested.connect(_on_battle_finished)
 	print("battle scene created")
+	print("focus owner:", get_viewport().gui_get_focus_owner())
 	fight_button.focus_mode = Control.FOCUS_ALL
 	await get_tree().process_frame
 	fight_button.grab_focus()
@@ -136,12 +137,10 @@ func _on_fight_button_pressed() -> void:
 	print("fight")
 func _on_escape_button_pressed() -> void:
 	main_command_selected.emit("escape")
-	queue_free()
 func _on_attack_button_pressed() -> void:
 	member_action_selected.emit("attack")
 func _on_battle_finished() -> void:
 	print("battle finished")
-	queue_free()
 func _on_member_action_selected(index,action):
 	member_action_selected.emit(index,action)
 func _on_enemy_target_selected(enemy):
