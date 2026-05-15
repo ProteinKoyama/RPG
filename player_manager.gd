@@ -11,3 +11,7 @@ func spawn_player(pos: Vector2):
 		get_tree().get_root().add_child.call_deferred(player_instance)
 
 	player_instance.global_position = pos
+
+func stop_player_animation():
+	if player_instance != null and player_instance.has_method("stop_movement_animation"):
+		player_instance.stop_movement_animation()

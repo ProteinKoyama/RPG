@@ -10,6 +10,8 @@ func _ready() -> void:
 	pass
 
 func _process(delta: float) -> void:
+	if PlayerManager.in_battle:
+		return
 	if char_in_area_flag:
 		if Input.is_action_just_released("interact") and PlayerManager.can_move:
 			emit_signal("character_interacted_signal",self)

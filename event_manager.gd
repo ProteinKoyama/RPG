@@ -19,8 +19,13 @@ func dialog_closed():
 	dialog_visible = false
 
 func start_battle(enemy_ids):
+	if PlayerManager.in_battle:
+		print("battle request ignored: already in battle")
+		return
 	print("battle requested")
 	PlayerManager.can_move = false
+	PlayerManager.in_battle = true
+	PlayerManager.stop_player_animation()
 	emit_signal("battle_requested", enemy_ids)
 func _on_battle_finished(result):
 	PlayerManager.can_move = true

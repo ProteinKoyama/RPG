@@ -11,6 +11,8 @@ func _ready():
 		sprite.texture = data.portrait
 
 func _unhandled_input(event):
+	if PlayerManager.in_battle:
+		return
 	if !player_in_range:
 		return
 	if busy:

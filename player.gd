@@ -9,6 +9,19 @@ var can_move = PlayerManager.can_move
 func _ready():
 	screen_size = get_viewport_rect().size
 
+func stop_movement_animation():
+	velocity = Vector2.ZERO
+	$AnimationSprite2D.stop()
+	match character_directions:
+		"right":
+			$AnimationSprite2D.animation = "right"
+		"left":
+			$AnimationSprite2D.animation = "left"
+		"back":
+			$AnimationSprite2D.animation = "back"
+		_:
+			$AnimationSprite2D.animation = "default"
+
 func _process(delta):
 	var velocity = Vector2.ZERO
 	can_move = PlayerManager.can_move
