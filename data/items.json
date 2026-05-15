@@ -1,0 +1,57 @@
+{
+	"will": {
+		"id": "will",
+		"name": "意思",
+		"type": "equipment",
+		"slot": "weapon",
+		"description": "少女が最初から持っている武器。",
+		"stats": {
+			"attack": 5
+		}
+	},
+	"cloth_body": {
+		"id": "cloth_body",
+		"name": "布の服",
+		"type": "equipment",
+		"slot": "body",
+		"description": "簡素な身体装備。",
+		"stats": {
+			"defense": 2
+		}
+	},
+	"small_charm": {
+		"id": "small_charm",
+		"name": "小さなお守り",
+		"type": "equipment",
+		"slot": "accessory",
+		"description": "身につけると少しだけ素早くなる。",
+		"stats": {
+			"speed": 1
+		}
+	},
+	"potion": {
+		"id": "potion",
+		"name": "水",
+		"type": "consumable",
+		"usable": true,
+		"usable_in_battle": true,
+		"scope": "ally",
+		"description": "味方1人のHPを10回復する。",
+		"effects": {
+			"hp": 10
+		}
+	},
+	"healing_kit": {
+		"id": "healing_kit",
+		"name": "回復キット",
+		"type": "consumable",
+		"usable": true,
+		"consume_on_use": false,
+		"usable_in_battle": false,
+		"scope": "party",
+		"description": "使ってもなくならない回復道具。味方全員のHPを全回復する。",
+		"effects": {
+			"hp_full": true
+		}
+	}
+}

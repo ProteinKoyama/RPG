@@ -1,9 +1,12 @@
 extends Node
 
+signal cutscene_finished
+
 func _ready():
 	EventManager.cutscene_requested.connect(_on_cutscene_requested)
 func _on_cutscene_requested(events: Array) -> void:
 	await play_events(events)
+	cutscene_finished.emit()
 func play_events(events: Array) -> void:
 	for e in events:
 		match e.event_type:

@@ -1,6 +1,7 @@
 extends Control
 
 @onready var enemy_sprite = $VBoxContainer/EnemySprite
+@onready var name_label = $VBoxContainer/NameLabel
 @onready var target_cursor = $TargetCursor
 
 var enemy_ref
@@ -37,6 +38,7 @@ func _ready():
 
 func setup(enemy):
 	enemy_ref = enemy
+	name_label.text = enemy.char_name
 	if enemy.image_path != "":
 		enemy_sprite.texture = load(enemy.image_path)
 	if death_mat:

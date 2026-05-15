@@ -24,6 +24,8 @@ EventManager="*res://event_manager.gd"
 BattleManager="*res://battle_manager.gd"
 PlayerManager="*res://player_manager.gd"
 EnemyDatabase="*res://enemy_database.gd"
+ItemDatabase="*res://item_database.gd"
+InventoryManager="*res://inventory_manager.gd"
 PartyManager="*res://party_manager.gd"
 MenuManager="*res://menu_manager.gd"
 DialogManager="*res://dialog_manager.gd"
@@ -155,3 +157,7 @@ menu={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":88,"key_label":0,"unicode":120,"location":0,"echo":false,"script":null)
 ]
 }
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0

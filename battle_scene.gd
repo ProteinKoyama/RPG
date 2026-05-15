@@ -7,6 +7,10 @@ extends Node
 @onready var party_container = $UI/CommandWindow/PartyContainer
 @onready var color_rect = $UI/ColorRect
 @onready var enemy_area = $UI/EnemyArea
+@onready var skill_window = $UI/SkillWindow
+@onready var skill_list = $UI/SkillWindow/SkillList
+@onready var description_panel = $UI/DescriptionPanel
+@onready var description_label = $UI/DescriptionPanel/DescriptionLabel
 
 var EnemyStatusScene = preload("res://enemy_status.tscn")
 var PartyStatusScene = preload("res://party_status.tscn")
@@ -15,13 +19,20 @@ signal main_command_selected(command)
 signal member_action_selected(index, action)
 signal cancel_requested
 signal enemy_target_selected(enemy)
+signal skill_selected(skill)
+signal item_selected(item_id)
+signal party_target_selected(index)
 
-var messages = BattleManager.messages
+var messages = []
 var target_select_active := false
 var target_enemy_index := 0
 var target_select_wait_accept_release := false
+var party_target_select_active := false
+var party_target_index := 0
+var party_target_wait_accept_release := false
 var main_command_active := false
 var main_command_locked := false
+var skill_select_active := false
 
 func _ready() -> void:
 	add_to_group("battle_scenes")
@@ -52,6 +63,10 @@ func show_main_commands():
 	main_command_active = true
 	main_command_locked = false
 	target_select_active = false
+	party_target_select_active = false
+	skill_select_active = false
+	_hide_action_description()
+	skill_window.hide()
 	disable_all_commands()
 	main_commands.visible = true
 	color_rect.show()
@@ -62,6 +77,9 @@ func show_main_commands():
 func show_action_commands():
 	main_command_active = false
 	main_command_locked = false
+	skill_select_active = false
+	_hide_action_description()
+	skill_window.hide()
 	print("show action")
 	main_commands.visible = false
 	color_rect.hide()
@@ -87,6 +105,32 @@ func focus_party_command(index):
 	await current.grab_first_button()
 
 func _input(event):
+	if skill_select_active:
+		if event.is_action_pressed("ui_cancel"):
+			cancel_requested.emit()
+			get_viewport().set_input_as_handled()
+		return
+
+	if party_target_select_active:
+		if party_target_wait_accept_release:
+			if event.is_action_pressed("ui_accept"):
+				get_viewport().set_input_as_handled()
+			return
+
+		if event.is_action_pressed("ui_right") or event.is_action_pressed("ui_down"):
+			_focus_party_target(party_target_index + 1)
+			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed("ui_left") or event.is_action_pressed("ui_up"):
+			_focus_party_target(party_target_index - 1)
+			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed("ui_accept"):
+			_confirm_party_target()
+			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed("ui_cancel"):
+			cancel_requested.emit()
+			get_viewport().set_input_as_handled()
+		return
+
 	if target_select_active:
 		if target_select_wait_accept_release:
 			if event.is_action_pressed("ui_accept"):
@@ -133,6 +177,10 @@ func close_scene():
 	main_command_locked = true
 	target_select_active = false
 	target_select_wait_accept_release = false
+	party_target_select_active = false
+	party_target_wait_accept_release = false
+	skill_select_active = false
+	_hide_action_description()
 	set_process_input(false)
 	set_process_unhandled_input(false)
 	get_viewport().gui_release_focus()
@@ -186,6 +234,9 @@ func get_enemy_offset(index, spacing):
 func start_target_select():
 	target_select_active = true
 	target_select_wait_accept_release = true
+	skill_select_active = false
+	_hide_action_description()
+	skill_window.hide()
 	main_command_active = false
 	target_enemy_index = 0
 	main_commands.hide()
@@ -205,6 +256,137 @@ func stop_target_select():
 	for child in enemy_area.get_children():
 		if child.has_method("disable_target_select"):
 			child.disable_target_select()
+
+func start_party_target_select(start_index := 0):
+	party_target_select_active = true
+	party_target_wait_accept_release = true
+	target_select_active = false
+	skill_select_active = false
+	_hide_action_description()
+	skill_window.hide()
+	main_command_active = false
+	party_target_index = start_index
+	main_commands.hide()
+	disable_all_commands()
+	for child in party_container.get_children():
+		if child.has_method("enable_target_select"):
+			child.enable_target_select()
+	connect_party_target_focus()
+	_focus_party_target(start_index)
+	get_viewport().set_input_as_handled()
+	await get_tree().process_frame
+	party_target_wait_accept_release = false
+
+func stop_party_target_select():
+	party_target_select_active = false
+	party_target_wait_accept_release = false
+	for child in party_container.get_children():
+		if child.has_method("disable_target_select"):
+			child.disable_target_select()
+
+func show_skill_select(skills: Array, current_sp: int):
+	disable_all_commands()
+	main_commands.hide()
+	skill_select_active = true
+	skill_window.show()
+	_show_action_description("")
+	for child in skill_list.get_children():
+		child.queue_free()
+	await get_tree().process_frame
+	for skill in skills:
+		var button := Button.new()
+		var cost = skill.get("sp_cost", 0)
+		button.text = skill.get("name", "特技") + " 消費SP " + str(cost)
+		button.focus_mode = Control.FOCUS_ALL
+		if current_sp < cost:
+			button.modulate = Color(0.65, 0.65, 0.65)
+		button.focus_entered.connect(_show_action_description.bind(_get_skill_description(skill)))
+		button.pressed.connect(_on_skill_button_selected.bind(skill, current_sp >= cost))
+		skill_list.add_child(button)
+	await get_tree().process_frame
+	var first_button = _get_first_enabled_button(skill_list)
+	if first_button:
+		first_button.grab_focus()
+
+func show_item_select(items: Dictionary):
+	disable_all_commands()
+	main_commands.hide()
+	skill_select_active = true
+	skill_window.show()
+	_show_action_description("")
+	for child in skill_list.get_children():
+		child.queue_free()
+	await get_tree().process_frame
+	var item_database = _get_item_database()
+	for item_id in items.keys():
+		var item = {}
+		if item_database != null:
+			item = item_database.get_item_data(item_id)
+		var button := Button.new()
+		button.text = item.get("name", item_id) + " x" + str(items[item_id])
+		button.focus_mode = Control.FOCUS_ALL
+		button.focus_entered.connect(_show_action_description.bind(item.get("description", "")))
+		button.pressed.connect(_on_item_button_selected.bind(item_id))
+		skill_list.add_child(button)
+	await get_tree().process_frame
+	var first_button = _get_first_enabled_button(skill_list)
+	if first_button:
+		first_button.grab_focus()
+
+func hide_skill_select():
+	skill_select_active = false
+	skill_window.hide()
+	_hide_action_description()
+	for child in skill_list.get_children():
+		child.queue_free()
+
+func _on_skill_button_selected(skill, can_use := true):
+	if !can_use:
+		return
+	hide_skill_select()
+	skill_selected.emit(skill)
+
+func _on_item_button_selected(item_id):
+	hide_skill_select()
+	item_selected.emit(item_id)
+
+func _get_item_database():
+	var tree = Engine.get_main_loop()
+	if !(tree is SceneTree):
+		return null
+	return tree.root.get_node_or_null("ItemDatabase")
+
+func _show_action_description(text: String):
+	description_label.text = text
+	description_panel.show()
+
+func _hide_action_description():
+	description_label.text = ""
+	description_panel.hide()
+
+func _get_skill_description(skill: Dictionary) -> String:
+	var cost = skill.get("sp_cost", 0)
+	var effect = "効果なし"
+	var target = skill.get("target", "enemy")
+	var power = float(skill.get("power", 1.0))
+	if target == "enemy":
+		var power_text = _format_power(power)
+		if skill.get("ignore_defense", false):
+			effect = "攻撃力の%s倍で防御を無視して攻撃する" % power_text
+		else:
+			effect = "攻撃力の%s倍で攻撃する" % power_text
+	return "SP：%d/%s" % [cost, effect]
+
+func _format_power(power: float) -> String:
+	if is_equal_approx(power, round(power)):
+		return str(int(round(power)))
+	return "%.1f" % power
+
+func _get_first_enabled_button(parent):
+	for child in parent.get_children():
+		if child is Button and !child.disabled:
+			return child
+	return null
 
 func _get_selectable_enemy_nodes():
 	var selectable_enemies = []
@@ -226,6 +408,43 @@ func _confirm_target_enemy():
 		return
 	target_enemy_index = clampi(target_enemy_index, 0, enemies.size() - 1)
 	enemy_target_selected.emit(enemies[target_enemy_index].enemy_ref)
+
+func _get_selectable_party_nodes():
+	var selectable_party = []
+	for member_status in party_container.get_children():
+		if member_status.has_method("enable_target_select") and member_status.member_ref != null:
+			selectable_party.append(member_status)
+	return selectable_party
+
+func _focus_party_target(index):
+	var members = _get_selectable_party_nodes()
+	if members.is_empty():
+		return
+	party_target_index = posmod(index, members.size())
+	members[party_target_index].grab_focus()
+
+func _confirm_party_target():
+	var members = _get_selectable_party_nodes()
+	if members.is_empty():
+		return
+	party_target_index = clampi(party_target_index, 0, members.size() - 1)
+	party_target_selected.emit(members[party_target_index].member_index)
+
+func connect_party_target_focus():
+	var member_nodes = party_container.get_children()
+	for i in range(member_nodes.size()):
+		var member = member_nodes[i]
+		member.focus_mode = Control.FOCUS_ALL
+		member.focus_neighbor_left = NodePath("")
+		member.focus_neighbor_right = NodePath("")
+		member.focus_neighbor_top = NodePath("")
+		member.focus_neighbor_bottom = NodePath("")
+		if i > 0:
+			member.focus_neighbor_left = member_nodes[i - 1].get_path()
+			member.focus_neighbor_top = member_nodes[i - 1].get_path()
+		if i < member_nodes.size() - 1:
+			member.focus_neighbor_right = member_nodes[i + 1].get_path()
+			member.focus_neighbor_bottom = member_nodes[i + 1].get_path()
 
 func connect_enemy_focus():
 	var enemy_nodes = enemy_area.get_children()

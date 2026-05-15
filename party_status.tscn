@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bbr0a4i5iu2ce" path="res://party_status.gd" id="1_vo5t0"]
 
 [node name="PartyStatus" type="Control"]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(100, 270)
 layout_direction = 2
 layout_mode = 3
 anchors_preset = 15
@@ -17,7 +17,7 @@ script = ExtResource("1_vo5t0")
 layout_mode = 0
 offset_right = 72.0
 offset_bottom = 23.0
-text = "player"
+text = "キャラ"
 
 [node name="StatusBars" type="VBoxContainer" parent="."]
 layout_mode = 0
@@ -27,26 +27,30 @@ offset_bottom = 77.0
 
 [node name="HPText" type="Label" parent="StatusBars"]
 layout_mode = 2
-text = "0"
+text = "HP 0/0"
 
 [node name="SPText" type="Label" parent="StatusBars"]
 layout_mode = 2
-text = "0"
+text = "SP 0/0"
 
 [node name="ActionCommands" type="VBoxContainer" parent="."]
 layout_mode = 0
 offset_top = 81.0
 offset_right = 72.0
-offset_bottom = 217.0
+offset_bottom = 270.0
 size_flags_stretch_ratio = 0.0
 
 [node name="AttackButton" type="Button" parent="ActionCommands"]
 layout_mode = 2
-text = "通常攻撃"
+text = "攻撃"
 
 [node name="SkillButton" type="Button" parent="ActionCommands"]
 layout_mode = 2
 text = "特技"
+
+[node name="ChargeButton" type="Button" parent="ActionCommands"]
+layout_mode = 2
+text = "チャージ"
 
 [node name="DefenseButton" type="Button" parent="ActionCommands"]
 layout_mode = 2
@@ -57,4 +61,7 @@ layout_mode = 2
 text = "アイテム"
 
 [connection signal="pressed" from="ActionCommands/AttackButton" to="." method="_on_attack_button_pressed"]
+[connection signal="pressed" from="ActionCommands/SkillButton" to="." method="_on_skill_button_pressed"]
+[connection signal="pressed" from="ActionCommands/ChargeButton" to="." method="_on_charge_button_pressed"]
 [connection signal="pressed" from="ActionCommands/DefenseButton" to="." method="_on_defense_button_pressed"]
+[connection signal="pressed" from="ActionCommands/ItemButton" to="." method="_on_item_button_pressed"]

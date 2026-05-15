@@ -5,6 +5,9 @@ signal battle_finished(battle_result)
 enum BattleState {
 	MAIN_COMMAND,
 	ACTION_SELECT,
+	SKILL_SELECT,
+	ITEM_SELECT,
+	PARTY_TARGET_SELECT,
 	TARGET_SELECT,
 	EXECUTE_TURN,
 	END
@@ -21,6 +24,8 @@ var current_member_index = 0
 var selected_actions = []
 var pending_action = ""
 var pending_member_index = 0
+var pending_skill = {}
+var pending_item_id = ""
 
 func _ready() -> void:
 	EventManager.battle_requested.connect(_on_battle_requested)
@@ -36,6 +41,9 @@ func start_battle(enemy_ids: Array):
 	battle_scene.main_command_selected.connect(_on_main_command_selected)
 	battle_scene.cancel_requested.connect(_on_cancel_requested)
 	battle_scene.enemy_target_selected.connect(_on_enemy_target_selected)
+	battle_scene.skill_selected.connect(_on_skill_selected)
+	battle_scene.item_selected.connect(_on_item_selected)
+	battle_scene.party_target_selected.connect(_on_party_target_selected)
 	get_tree().current_scene.add_child(battle_scene)
 
 	party = PartyManager.get_party()
@@ -137,27 +145,11 @@ func execute_turn():
 			var command_data = get_action_for_character(character)
 			if command_data == null:
 				continue
-			match command_data["action"]:
-				"attack":
-					var target = command_data["target"]
-					if target == null or !target.is_alive():
-						target = get_first_alive_enemy()
-					if target == null:
-						return
-					await battle_scene.show_message(character.char_name + " attacks!")
-					var damage = target.take_damage(character.attack)
-					print(target.char_name, "damage:", damage, "HP:", target.hp, "/", target.max_hp)
-					await battle_scene.show_message(target.char_name + " takes " + str(damage) + " damage!")
-				"defense":
-					character.start_defense()
-					await battle_scene.show_message(character.char_name + " defends!")
+			await execute_character_action(character, command_data, get_first_alive_enemy())
 		elif enemies.has(character):
-			var target = get_first_alive_party_member()
-			if target == null:
-				return
-			await battle_scene.show_message(character.char_name + " attacks!")
-			var damage = target.take_damage(character.attack)
-			await battle_scene.show_message(target.char_name + " takes " + str(damage) + " damage!")
+			character.battle_turn_count += 1
+			var enemy_action = choose_enemy_action(character)
+			await execute_character_action(character, enemy_action, get_first_alive_party_member())
 
 		await battle_scene.update_party_ui(party)
 		await battle_scene.remove_dead_enemies()
@@ -169,6 +161,142 @@ func execute_turn():
 	current_member_index = 0
 	state = BattleState.MAIN_COMMAND
 	await battle_scene.show_main_commands()
+
+func execute_character_action(character, command_data: Dictionary, fallback_target):
+	match command_data.get("action", "attack"):
+		"attack":
+			var target = command_data.get("target", fallback_target)
+			if target == null or !target.is_alive():
+				target = fallback_target
+			if target == null:
+				return
+			await execute_attack_action(character, target)
+		"skill":
+			var skill = command_data.get("skill", {})
+			var target = command_data.get("target", fallback_target)
+			if target == null or !target.is_alive():
+				target = fallback_target
+			if skill.is_empty() or target == null:
+				return
+			await execute_skill_action(character, skill, target)
+		"defense":
+			character.start_defense()
+			await battle_scene.show_message(character.char_name + "は防御している！")
+		"charge":
+			character.charge_sp()
+			await battle_scene.show_message(character.char_name + "はSPをためた！")
+		"item":
+			var item_id = command_data.get("item_id", "")
+			var target = command_data.get("target", character)
+			await execute_item_action(character, item_id, target)
+
+func execute_attack_action(character, target):
+	await battle_scene.show_message(character.char_name + "の攻撃！")
+	var damage = target.take_damage(character.attack)
+	print(target.char_name, "damage:", damage, "HP:", target.hp, "/", target.max_hp)
+	await battle_scene.show_message(target.char_name + "に" + str(damage) + "ダメージ！")
+
+func execute_skill_action(character, skill: Dictionary, target):
+	if !character.can_use_skill(skill):
+		await battle_scene.show_message(character.char_name + "はSPが足りない！")
+		return
+
+	character.consume_sp(skill.get("sp_cost", 0))
+	var power = skill.get("power", 1.0)
+	var skill_attack = int(character.attack * power)
+	var damage = 0
+	if skill.get("ignore_defense", false):
+		damage = target.take_direct_damage(skill_attack)
+	else:
+		damage = target.take_damage(skill_attack)
+
+	await battle_scene.show_message(character.char_name + "は" + skill.get("name", "特技") + "を使った！")
+	await battle_scene.show_message(target.char_name + "に" + str(damage) + "ダメージ！")
+
+func execute_item_action(character, item_id: String, target):
+	if item_id == "":
+		return
+	var item = ItemDatabase.get_item_data(item_id)
+	if item.is_empty():
+		return
+	var item_name = item.get("name", item_id)
+	if InventoryManager.use_item(item_id, target, true):
+		await battle_scene.show_message(character.char_name + "は" + item_name + "を使った！")
+	else:
+		await battle_scene.show_message(item_name + "は使えない！")
+
+func choose_enemy_action(enemy):
+	var rules = enemy.ai_rules.duplicate()
+	rules.sort_custom(
+		func(a, b):
+			return int(a.get("priority", 0)) > int(b.get("priority", 0))
+	)
+
+	for rule in rules:
+		if !enemy_ai_rule_matches(enemy, rule):
+			continue
+		var action_data = build_enemy_action(enemy, rule)
+		if !action_data.is_empty():
+			return action_data
+
+	return {
+		"action": "attack",
+		"target": get_first_alive_party_member()
+	}
+
+func enemy_ai_rule_matches(enemy, rule: Dictionary) -> bool:
+	match rule.get("condition", "always"):
+		"always":
+			return true
+		"turn_interval":
+			var interval = max(1, int(rule.get("interval", 1)))
+			return enemy.battle_turn_count % interval == 0
+		"turn":
+			return enemy.battle_turn_count == int(rule.get("turn", 1))
+		"hp_below":
+			var hp_rate = float(rule.get("hp_rate", 0.5))
+			return float(enemy.hp) / float(enemy.max_hp) <= hp_rate
+		"sp_below":
+			return enemy.sp < int(rule.get("sp", 1))
+		"sp_below_skill":
+			var skill = get_skill_by_id(enemy, rule.get("skill_id", ""))
+			if skill.is_empty():
+				return false
+			return enemy.sp < skill.get("sp_cost", 0)
+	return false
+
+func build_enemy_action(enemy, rule: Dictionary) -> Dictionary:
+	var action = rule.get("action", "attack")
+	match action:
+		"skill":
+			var skill = get_skill_by_id(enemy, rule.get("skill_id", ""))
+			if skill.is_empty() or !enemy.can_use_skill(skill):
+				return {}
+			return {
+				"action": "skill",
+				"skill": skill,
+				"target": get_first_alive_party_member()
+			}
+		"charge":
+			return {
+				"action": "charge"
+			}
+		"defense":
+			return {
+				"action": "defense"
+			}
+		"attack":
+			return {
+				"action": "attack",
+				"target": get_first_alive_party_member()
+			}
+	return {}
+
+func get_skill_by_id(character, skill_id: String) -> Dictionary:
+	for skill in character.skills:
+		if skill.get("id", "") == skill_id:
+			return skill
+	return {}
 
 func get_action_for_character(character):
 	for data in selected_actions:
@@ -189,17 +317,27 @@ func check_battle_end(result = null):
 
 	if all_party_dead:
 		state = BattleState.END
-		await battle_scene.show_message("Defeated...")
+		await battle_scene.show_message("全滅した...")
 		end_battle("lose")
 		return true
 
 	if all_enemies_dead:
 		state = BattleState.END
-		await battle_scene.show_message("Victory!")
+		await battle_scene.show_message("勝利！")
+		await apply_victory_rewards()
 		end_battle("win")
 		return true
 
 	return false
+
+func apply_victory_rewards():
+	for member in party:
+		if !member.is_alive():
+			continue
+		var learned_skill_names = member.level_up()
+		await battle_scene.show_message(member.char_name + "はレベル" + str(member.level) + "になった！")
+		for skill_name in learned_skill_names:
+			await battle_scene.show_message(member.char_name + "は" + skill_name + "を覚えた！")
 
 func get_first_alive_enemy():
 	for enemy in enemies:
@@ -255,12 +393,37 @@ func _on_member_action_selected(index, action):
 		"attack":
 			pending_member_index = index
 			pending_action = action
+			pending_skill = {}
 			state = BattleState.TARGET_SELECT
 			battle_scene.start_target_select()
+		"skill":
+			state = BattleState.SKILL_SELECT
+			pending_member_index = index
+			pending_action = "skill"
+			pending_item_id = ""
+			await battle_scene.show_skill_select(party[index].skills, party[index].sp)
+		"item":
+			state = BattleState.ITEM_SELECT
+			pending_member_index = index
+			pending_action = "item"
+			pending_skill = {}
+			var usable_items = InventoryManager.get_usable_items(true)
+			if usable_items.is_empty():
+				await battle_scene.show_message("使えるアイテムがない！")
+				state = BattleState.ACTION_SELECT
+				await battle_scene.focus_party_command(index)
+				return
+			await battle_scene.show_item_select(usable_items)
 		"defense":
 			selected_actions.append({
 				"user": party[index],
 				"action": "defense"
+			})
+			await advance_after_action_selected()
+		"charge":
+			selected_actions.append({
+				"user": party[index],
+				"action": "charge"
 			})
 			await advance_after_action_selected()
 
@@ -268,13 +431,62 @@ func _on_cancel_requested():
 	match state:
 		BattleState.TARGET_SELECT:
 			await cancel_target_select()
+		BattleState.SKILL_SELECT:
+			await cancel_skill_select()
+		BattleState.ITEM_SELECT:
+			await cancel_item_select()
+		BattleState.PARTY_TARGET_SELECT:
+			await cancel_party_target_select()
 		BattleState.ACTION_SELECT:
 			await cancel_action_select()
+
+func cancel_skill_select():
+	battle_scene.hide_skill_select()
+	state = BattleState.ACTION_SELECT
+	await battle_scene.focus_party_command(pending_member_index)
+
+func cancel_item_select():
+	battle_scene.hide_skill_select()
+	state = BattleState.ACTION_SELECT
+	await battle_scene.focus_party_command(pending_member_index)
+
+func cancel_party_target_select():
+	battle_scene.stop_party_target_select()
+	state = BattleState.ITEM_SELECT
+	var usable_items = InventoryManager.get_usable_items(true)
+	await battle_scene.show_item_select(usable_items)
 
 func cancel_target_select():
 	battle_scene.stop_target_select()
 	state = BattleState.ACTION_SELECT
 	await battle_scene.focus_party_command(pending_member_index)
+
+func _on_skill_selected(skill):
+	if state != BattleState.SKILL_SELECT:
+		return
+	pending_skill = skill
+	state = BattleState.TARGET_SELECT
+	battle_scene.start_target_select()
+
+func _on_item_selected(item_id):
+	if state != BattleState.ITEM_SELECT:
+		return
+	pending_item_id = item_id
+	state = BattleState.PARTY_TARGET_SELECT
+	await battle_scene.start_party_target_select(pending_member_index)
+
+func _on_party_target_selected(index):
+	if state != BattleState.PARTY_TARGET_SELECT:
+		return
+	battle_scene.stop_party_target_select()
+	selected_actions.append({
+		"user": party[pending_member_index],
+		"action": "item",
+		"item_id": pending_item_id,
+		"target": party[index]
+	})
+	current_member_index = pending_member_index
+	await advance_after_action_selected()
 
 func _on_enemy_target_selected(enemy):
 	if state != BattleState.TARGET_SELECT:
@@ -283,6 +495,7 @@ func _on_enemy_target_selected(enemy):
 	selected_actions.append({
 		"user": party[pending_member_index],
 		"action": pending_action,
+		"skill": pending_skill,
 		"target": enemy
 	})
 	current_member_index = pending_member_index

@@ -1,33 +1,94 @@
-[gd_scene load_steps=6 format=3 uid="uid://bixgx6is1r0ad"]
+[gd_scene load_steps=13 format=3 uid="uid://bixgx6is1r0ad"]
 
 [ext_resource type="Script" uid="uid://bgqcj5rgps2tg" path="res://npc.gd" id="1_xxcha"]
 [ext_resource type="Resource" uid="uid://cnljyilgxdwof" path="res://tres/moeko.tres" id="2_ul7y6"]
 [ext_resource type="Texture2D" uid="uid://c1o76mhjglfq6" path="res://assets/charachip/Chara_doctor_common.png" id="3_kh24r"]
+[ext_resource type="Texture2D" uid="uid://cp2c5q2cfxfow" path="res://assets/charachip/Chara_Romachang.png" id="4_ul7y6"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ul7y6"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
 size = Vector2(506.667, 650)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_mcvl2"]
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_npc"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_back"]
+atlas = ExtResource("3_kh24r")
+region = Rect2(15, 60, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bc6q4"]
+atlas = ExtResource("4_ul7y6")
+region = Rect2(20, 0, 20, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_left"]
+atlas = ExtResource("3_kh24r")
+region = Rect2(15, 20, 15, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_right"]
+atlas = ExtResource("3_kh24r")
+region = Rect2(15, 40, 15, 20)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_npc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_back")
+}],
+"loop": true,
+"name": &"back",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bc6q4")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_left")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_right")
+}],
+"loop": true,
+"name": &"right",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(158.333, 290.0005)
 
-[node name="NPC" type="Area2D"]
+[node name="NPC" type="StaticBody2D"]
+light_mask = 2
+scale = Vector2(0.2, 0.2)
+collision_layer = 2
+collision_mask = 1
+physics_material_override = SubResource("PhysicsMaterial_npc")
 script = ExtResource("1_xxcha")
 data = ExtResource("2_ul7y6")
+metadata/_edit_group_ = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="InteractArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
 position = Vector2(0, 75)
-shape = SubResource("RectangleShape2D_ul7y6")
+shape = SubResource("RectangleShape2D_interact")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
 scale = Vector2(15, 15)
-texture = ExtResource("3_kh24r")
-region_rect = Rect2(23.329048, 0.09615803, 13.166557, 18.911968)
+sprite_frames = SubResource("SpriteFrames_npc")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 29.999746)
 scale = Vector2(0.99999994, 0.99999994)
-shape = SubResource("RectangleShape2D_mcvl2")
+shape = SubResource("RectangleShape2D_body")
 
-[connection signal="body_entered" from="." to="." method="_on_body_entered"]
-[connection signal="body_exited" from="." to="." method="_on_body_exited"]
+[connection signal="body_entered" from="InteractArea" to="." method="_on_body_entered"]
+[connection signal="body_exited" from="InteractArea" to="." method="_on_body_exited"]

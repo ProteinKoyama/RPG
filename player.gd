@@ -22,28 +22,28 @@ func stop_movement_animation():
 		_:
 			$AnimationSprite2D.animation = "default"
 
-func _process(delta):
-	var velocity = Vector2.ZERO
+func _physics_process(_delta):
+	var input_velocity = Vector2.ZERO
 	can_move = PlayerManager.can_move
 	if can_move:
 		if Input.is_action_pressed("move_right"):
-			velocity.x += 1
+			input_velocity.x += 1
 			$AnimationSprite2D.animation = "walk_right"
 			character_directions = "right"
 		if Input.is_action_pressed("move_left"):
-			velocity.x -= 1
+			input_velocity.x -= 1
 			$AnimationSprite2D.animation = "walk_left"
 			character_directions = "left"
 		if Input.is_action_pressed("move_up"):
 			$AnimationSprite2D.animation = "back_walk"
-			velocity.y -= 1
+			input_velocity.y -= 1
 			character_directions = "back"
 		if Input.is_action_pressed("move_down"):
 			$AnimationSprite2D.animation = "walk_front"
-			velocity.y += 1
+			input_velocity.y += 1
 			character_directions = "front"
-		if velocity.length() > 0:
-			velocity = velocity.normalized() * speed
+		if input_velocity.length() > 0:
+			input_velocity = input_velocity.normalized() * speed
 			$AnimationSprite2D.play()
 		else:
 			$AnimationSprite2D.animation = "default"
@@ -53,9 +53,13 @@ func _process(delta):
 				$AnimationSprite2D.animation = "left"
 			if character_directions == "back":
 				$AnimationSprite2D.animation = "back"
-		position += velocity * delta
+		velocity = input_velocity
+	else:
+		velocity = Vector2.ZERO
 	#position = position.clamp(Vector2.ZERO, screen_size)
-	velocity = move_and_slide()
+	move_and_slide()
+
+func _process(_delta):
 	if Input.is_action_just_pressed("interact") and !key_detected_flag:
 		pass
 func _unhandled_input(event):

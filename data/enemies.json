@@ -2,17 +2,94 @@
 	"slime": {
 		"name": "スライム",
 		"hp": 30,
+		"sp": 3,
+		"initial_sp": 0,
 		"attack": 5,
 		"defense": 0,
 		"speed": 3,
-		"image": "assets/pictures/slime.png"
+		"image": "assets/pictures/slime.png",
+		"skills": [
+			{
+				"id": "acid",
+				"name": "酸攻撃",
+				"sp_cost": 1,
+				"target": "enemy",
+				"power": 1.8
+			}
+		],
+		"ai_rules": [
+			{
+				"priority": 100,
+				"condition": "hp_below",
+				"hp_rate": 0.4,
+				"action": "skill",
+				"skill_id": "acid"
+			},
+			{
+				"priority": 80,
+				"condition": "turn_interval",
+				"interval": 3,
+				"action": "skill",
+				"skill_id": "acid"
+			},
+			{
+				"priority": 50,
+				"condition": "sp_below_skill",
+				"skill_id": "acid",
+				"action": "charge"
+			},
+			{
+				"priority": 0,
+				"condition": "always",
+				"action": "attack"
+			}
+		]
 	},
 
 	"shadow": {
 		"name": "影",
 		"hp": 90,
+		"sp": 4,
+		"initial_sp": 1,
 		"attack": 20,
 		"defense": 10,
-		"speed": 15
+		"speed": 15,
+		"skills": [
+			{
+				"id": "shadow_pierce",
+				"name": "影抜き",
+				"sp_cost": 2,
+				"target": "enemy",
+				"power": 1.2,
+				"ignore_defense": true
+			}
+		],
+		"ai_rules": [
+			{
+				"priority": 100,
+				"condition": "hp_below",
+				"hp_rate": 0.35,
+				"action": "skill",
+				"skill_id": "shadow_pierce"
+			},
+			{
+				"priority": 80,
+				"condition": "turn_interval",
+				"interval": 2,
+				"action": "skill",
+				"skill_id": "shadow_pierce"
+			},
+			{
+				"priority": 50,
+				"condition": "sp_below_skill",
+				"skill_id": "shadow_pierce",
+				"action": "charge"
+			},
+			{
+				"priority": 0,
+				"condition": "always",
+				"action": "attack"
+			}
+		]
 	}
 }

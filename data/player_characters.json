@@ -1,18 +1,52 @@
 {
-	"girl":{
-		"name":"少女",
-		"id":"girl",
-		"hp":100,
-		"attack":30,
-		"defense":20,
-		"speed":20
+	"girl": {
+		"name": "少女",
+		"id": "girl",
+		"level": 1,
+		"hp": 100,
+		"sp": 3,
+		"attack": 30,
+		"defense": 20,
+		"speed": 20,
+		"equipment": {
+			"weapon": "will",
+			"body": "",
+			"accessory1": "",
+			"accessory2": ""
+		},
+		"skills": [
+			{
+				"id": "power_strike",
+				"name": "強打",
+				"sp_cost": 1,
+				"target": "enemy",
+				"power": 3.0
+			}
+		],
+		"learn_skills": []
 	},
-	"moeko":{
-		"name":"モエ子",
-		"id":"moeko",
-		"hp":80,
-		"attack":10,
-		"defense":10,
-		"speed":30,
+	"moeko": {
+		"name": "モエ子",
+		"id": "moeko",
+		"level": 1,
+		"hp": 80,
+		"sp": 5,
+		"attack": 10,
+		"defense": 10,
+		"speed": 30,
+		"skills": [],
+		"learn_skills": [
+			{
+				"level": 2,
+				"skill": {
+					"id": "pierce_attack",
+					"name": "貫通攻撃",
+					"sp_cost": 1,
+					"target": "enemy",
+					"power": 1.0,
+					"ignore_defense": true
+				}
+			}
+		]
 	}
 }
