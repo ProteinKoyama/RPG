@@ -1,0 +1,4 @@
+Godot Engine v4.0.3.stable.official.5222a99f5 - https://godotengine.org
+ 
+USER SCRIPT ERROR: Compile Error: Identifier not found: EventManager
+   at: GDScript::reload (res://battle_manager.gd:32)

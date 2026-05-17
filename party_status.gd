@@ -2,6 +2,8 @@ extends Control
 
 @onready var name_label = $NameLabel
 @onready var hp_text = $StatusBars/HPText
+@onready var effect_text = $FaceSlot/EffectText
+@onready var face_graphic = $FaceSlot/FaceGraphic
 @onready var attack_button = $ActionCommands/AttackButton
 @onready var sp_text = $StatusBars/SPText
 @onready var skill_button = $ActionCommands/SkillButton
@@ -26,7 +28,25 @@ func setup(character,index):
 	name_label.text = character.char_name + " Lv." + str(character.level)
 	hp_text.text = "HP " + str(character.hp) + "/" + str(character.max_hp)
 	sp_text.text = "SP " + str(character.sp) + "/" + str(character.max_sp)
+	effect_text.text = _get_effect_text(character)
+	face_graphic.visible = character.char_id == "girl"
 	attack_button.focus_mode = Control.FOCUS_ALL
+
+func _get_effect_text(character) -> String:
+	if character == null or !character.has_method("get_active_effect_labels"):
+		return ""
+	var labels = character.get_active_effect_labels()
+	if labels.is_empty():
+		return ""
+	return _join_strings(labels, "\n")
+
+func _join_strings(values: Array, separator: String) -> String:
+	var text := ""
+	for i in range(values.size()):
+		if i > 0:
+			text += separator
+		text += str(values[i])
+	return text
 
 func grab_first_button():
 	await get_tree().process_frame

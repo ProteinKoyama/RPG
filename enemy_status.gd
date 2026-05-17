@@ -2,6 +2,7 @@ extends Control
 
 @onready var enemy_sprite = $VBoxContainer/EnemySprite
 @onready var name_label = $VBoxContainer/NameLabel
+@onready var effect_label = $VBoxContainer/EffectLabel
 @onready var target_cursor = $TargetCursor
 
 var enemy_ref
@@ -39,6 +40,7 @@ func _ready():
 func setup(enemy):
 	enemy_ref = enemy
 	name_label.text = enemy.char_name
+	refresh_effects()
 	if enemy.image_path != "":
 		enemy_sprite.texture = load(enemy.image_path)
 	if death_mat:
@@ -47,6 +49,25 @@ func setup(enemy):
 	modulate = Color.WHITE
 	scale = Vector2.ONE
 	is_dying = false
+
+func refresh_effects():
+	effect_label.text = _get_effect_text(enemy_ref)
+
+func _get_effect_text(enemy) -> String:
+	if enemy == null or !enemy.has_method("get_active_effect_labels"):
+		return ""
+	var labels = enemy.get_active_effect_labels()
+	if labels.is_empty():
+		return ""
+	return _join_strings(labels, " / ")
+
+func _join_strings(values: Array, separator: String) -> String:
+	var text := ""
+	for i in range(values.size()):
+		if i > 0:
+			text += separator
+		text += str(values[i])
+	return text
 
 func _unhandled_input(event):
 	pass

@@ -11,6 +11,7 @@ extends Node
 @onready var skill_list = $UI/SkillWindow/SkillList
 @onready var description_panel = $UI/DescriptionPanel
 @onready var description_label = $UI/DescriptionPanel/DescriptionLabel
+@onready var bgm_player = $BGMPlayer
 
 var EnemyStatusScene = preload("res://enemy_status.tscn")
 var PartyStatusScene = preload("res://party_status.tscn")
@@ -33,6 +34,9 @@ var party_target_wait_accept_release := false
 var main_command_active := false
 var main_command_locked := false
 var skill_select_active := false
+var escape_enabled := true
+var previous_bgm_player: AudioStreamPlayer = null
+var previous_bgm_was_playing := false
 
 func _ready() -> void:
 	add_to_group("battle_scenes")
@@ -40,11 +44,7 @@ func _ready() -> void:
 	print("focus owner:", get_viewport().gui_get_focus_owner())
 
 	fight_button.focus_mode = Control.FOCUS_ALL
-	escape_button.focus_mode = Control.FOCUS_ALL
-	fight_button.focus_neighbor_bottom = escape_button.get_path()
-	escape_button.focus_neighbor_top = fight_button.get_path()
-	fight_button.focus_next = escape_button.get_path()
-	escape_button.focus_previous = fight_button.get_path()
+	_apply_escape_enabled()
 
 	if not fight_button.pressed.is_connected(_on_fight_button_pressed):
 		fight_button.pressed.connect(_on_fight_button_pressed)
@@ -71,6 +71,7 @@ func show_main_commands():
 	main_commands.visible = true
 	color_rect.show()
 	main_commands.show()
+	_apply_escape_enabled()
 	await get_tree().process_frame
 	fight_button.grab_focus()
 
@@ -155,14 +156,17 @@ func _input(event):
 		return
 
 	if event.is_action_pressed("ui_down"):
-		escape_button.grab_focus()
+		if escape_enabled:
+			escape_button.grab_focus()
+		else:
+			fight_button.grab_focus()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_up"):
 		fight_button.grab_focus()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_accept"):
 		var focus_owner = get_viewport().gui_get_focus_owner()
-		if focus_owner == escape_button:
+		if focus_owner == escape_button and escape_enabled:
 			_select_main_command("escape")
 		else:
 			_select_main_command("fight")
@@ -181,12 +185,69 @@ func close_scene():
 	party_target_wait_accept_release = false
 	skill_select_active = false
 	_hide_action_description()
+	stop_battle_bgm()
 	set_process_input(false)
 	set_process_unhandled_input(false)
 	get_viewport().gui_release_focus()
 	if has_node("UI"):
 		$UI.visible = false
 	queue_free()
+
+func set_escape_enabled(enabled: bool):
+	escape_enabled = enabled
+	_apply_escape_enabled()
+
+func _apply_escape_enabled():
+	if fight_button == null or escape_button == null:
+		return
+	escape_button.disabled = !escape_enabled
+	escape_button.focus_mode = Control.FOCUS_ALL if escape_enabled else Control.FOCUS_NONE
+	if escape_enabled:
+		fight_button.focus_neighbor_bottom = escape_button.get_path()
+		fight_button.focus_next = escape_button.get_path()
+		escape_button.focus_neighbor_top = fight_button.get_path()
+		escape_button.focus_previous = fight_button.get_path()
+	else:
+		fight_button.focus_neighbor_bottom = fight_button.get_path()
+		fight_button.focus_next = fight_button.get_path()
+		escape_button.focus_neighbor_top = NodePath("")
+		escape_button.focus_previous = NodePath("")
+
+func play_battle_bgm(path: String):
+	if path == "":
+		return
+	var stream = load(path)
+	if stream == null:
+		print("battle bgm not found:", path)
+		return
+	_pause_map_bgm()
+	bgm_player.stream = stream
+	bgm_player.play()
+
+func stop_battle_bgm():
+	if bgm_player != null:
+		bgm_player.stop()
+	_resume_map_bgm()
+
+func _pause_map_bgm():
+	var current_scene = get_tree().current_scene
+	if current_scene == null:
+		return
+	var map_bgm_player = current_scene.get_node_or_null("BGMPlayer")
+	if map_bgm_player == null or map_bgm_player == bgm_player:
+		return
+	previous_bgm_player = map_bgm_player
+	previous_bgm_was_playing = previous_bgm_player.playing
+	if previous_bgm_was_playing:
+		previous_bgm_player.stream_paused = true
+
+func _resume_map_bgm():
+	if previous_bgm_player == null:
+		return
+	if is_instance_valid(previous_bgm_player) and previous_bgm_was_playing:
+		previous_bgm_player.stream_paused = false
+	previous_bgm_player = null
+	previous_bgm_was_playing = false
 
 func update_party_ui(party):
 	for child in party_container.get_children():
@@ -284,7 +345,7 @@ func stop_party_target_select():
 		if child.has_method("disable_target_select"):
 			child.disable_target_select()
 
-func show_skill_select(skills: Array, current_sp: int):
+func show_skill_select(skills: Array, current_sp: int, current_hp: int):
 	disable_all_commands()
 	main_commands.hide()
 	skill_select_active = true
@@ -295,13 +356,18 @@ func show_skill_select(skills: Array, current_sp: int):
 	await get_tree().process_frame
 	for skill in skills:
 		var button := Button.new()
-		var cost = skill.get("sp_cost", 0)
-		button.text = skill.get("name", "特技") + " 消費SP " + str(cost)
+		var sp_cost = skill.get("sp_cost", 0)
+		var hp_cost = skill.get("hp_cost", 0)
+		var can_use = current_sp >= sp_cost and current_hp >= hp_cost
+		var cost_text = _get_skill_cost_text(skill)
+		button.text = skill.get("name", "特技")
+		if cost_text != "":
+			button.text += " " + cost_text
 		button.focus_mode = Control.FOCUS_ALL
-		if current_sp < cost:
+		if !can_use:
 			button.modulate = Color(0.65, 0.65, 0.65)
-		button.focus_entered.connect(_show_action_description.bind(_get_skill_description(skill)))
-		button.pressed.connect(_on_skill_button_selected.bind(skill, current_sp >= cost))
+		button.focus_entered.connect(_show_action_description.bind(_get_battle_skill_description(skill)))
+		button.pressed.connect(_on_skill_button_selected.bind(skill, can_use))
 		skill_list.add_child(button)
 	await get_tree().process_frame
 	var first_button = _get_first_enabled_button(skill_list)
@@ -356,6 +422,12 @@ func _get_item_database():
 		return null
 	return tree.root.get_node_or_null("ItemDatabase")
 
+func _get_skill_database():
+	var tree = Engine.get_main_loop()
+	if !(tree is SceneTree):
+		return null
+	return tree.root.get_node_or_null("SkillDatabase")
+
 func _show_action_description(text: String):
 	description_label.text = text
 	description_panel.show()
@@ -364,18 +436,25 @@ func _hide_action_description():
 	description_label.text = ""
 	description_panel.hide()
 
-func _get_skill_description(skill: Dictionary) -> String:
-	var cost = skill.get("sp_cost", 0)
-	var effect = "効果なし"
-	var target = skill.get("target", "enemy")
-	var power = float(skill.get("power", 1.0))
-	if target == "enemy":
-		var power_text = _format_power(power)
-		if skill.get("ignore_defense", false):
-			effect = "攻撃力の%s倍で防御を無視して攻撃する" % power_text
-		else:
-			effect = "攻撃力の%s倍で攻撃する" % power_text
-	return "SP：%d/%s" % [cost, effect]
+func _get_skill_cost_text(skill: Dictionary) -> String:
+	var skill_database = _get_skill_database()
+	if skill_database != null:
+		return skill_database.get_skill_cost_text(skill)
+	return ""
+
+func _get_battle_skill_description(skill: Dictionary) -> String:
+	var skill_database = _get_skill_database()
+	if skill_database != null:
+		return skill_database.get_battle_skill_description(skill)
+	return skill.get("name", "特技")
+
+func _join_strings(values: Array, separator: String) -> String:
+	var text := ""
+	for i in range(values.size()):
+		if i > 0:
+			text += separator
+		text += str(values[i])
+	return text
 
 func _format_power(power: float) -> String:
 	if is_equal_approx(power, round(power)):
@@ -470,14 +549,23 @@ func remove_dead_enemies():
 	await get_tree().process_frame
 	connect_enemy_focus()
 
+func refresh_enemy_status_ui():
+	for enemy_ui in enemy_area.get_children():
+		if enemy_ui.has_method("refresh_effects"):
+			enemy_ui.refresh_effects()
+
 func _on_fight_button_pressed() -> void:
 	_select_main_command("fight")
 
 func _on_escape_button_pressed() -> void:
+	if !escape_enabled:
+		return
 	_select_main_command("escape")
 
 func _select_main_command(command):
 	if not main_command_active or main_command_locked:
+		return
+	if command == "escape" and !escape_enabled:
 		return
 	main_command_locked = true
 	main_command_active = false

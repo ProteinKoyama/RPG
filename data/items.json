@@ -7,7 +7,33 @@
 		"description": "少女が最初から持っている武器。",
 		"stats": {
 			"attack": 5
+		},
+		"skill_ids": [
+			"determination"
+		]
+	},
+	"wooden_sword": {
+		"id": "wooden_sword",
+		"name": "木刀",
+		"type": "equipment",
+		"slot": "weapon",
+		"description": "稽古用の木刀。攻撃力が10上がる。",
+		"stats": {
+			"attack": 10
 		}
+	},
+	"white_night_sword": {
+		"id": "white_night_sword",
+		"name": "白夜の剣",
+		"type": "equipment",
+		"slot": "weapon",
+		"description": "少女だけが扱える白い剣。",
+		"equip_character_ids": [
+			"girl"
+		],
+		"skill_ids": [
+			"dark_cleave"
+		]
 	},
 	"cloth_body": {
 		"id": "cloth_body",

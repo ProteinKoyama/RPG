@@ -1,10 +1,11 @@
 extends Control
 
 @onready var party_list = $PanelContainer/HBoxContainer/PartyList
-@onready var detail_panel = $PanelContainer/HBoxContainer/DetailPanel
+@onready var detail_panel = $PanelContainer/HBoxContainer/DetailPanel/Content
 @onready var menu_commands = $PanelContainer/HBoxContainer/MenuCommands
 @onready var character_list_button = $PanelContainer/HBoxContainer/MenuCommands/CharacterListButton
 @onready var item_button = $PanelContainer/HBoxContainer/MenuCommands/ItemButton
+@onready var option_button = $PanelContainer/HBoxContainer/MenuCommands/OptionButton
 
 var current_party: Array = []
 var selected_member_index := 0
@@ -14,12 +15,15 @@ var showing_member_detail := false
 var equipment_select_slot := ""
 var pending_item_id := ""
 var last_top_button: Button = null
+var equipment_description_label: Label = null
+var equipment_preview_list: VBoxContainer = null
 
 func _ready():
 	hide()
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 	character_list_button.pressed.connect(_open_party_screen)
 	item_button.pressed.connect(_open_item_screen)
+	option_button.pressed.connect(_open_option_screen)
 
 func open_menu():
 	current_party = PartyManager.get_party()
@@ -55,6 +59,10 @@ func _input(event):
 		get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("ui_cancel") and current_screen == "items":
+		await _return_to_top_menu()
+		get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("ui_cancel") and current_screen == "options":
 		await _return_to_top_menu()
 		get_viewport().set_input_as_handled()
 		return
@@ -102,6 +110,21 @@ func _open_item_screen():
 	_update_inventory_view()
 	await get_tree().process_frame
 	_grab_first_inventory_button()
+
+func _open_option_screen():
+	current_screen = "options"
+	showing_member_detail = false
+	equipment_select_slot = ""
+	pending_item_id = ""
+	last_top_button = option_button
+	menu_commands.show()
+	party_list.hide()
+	detail_panel.show()
+	_update_option_view()
+	await get_tree().process_frame
+	var first_slider = _find_first_slider(detail_panel)
+	if first_slider:
+		first_slider.grab_focus()
 
 func _update_party_list():
 	for child in party_list.get_children():
@@ -199,7 +222,7 @@ func _add_all_members_view():
 		row.add_child(hp)
 		row.add_child(sp)
 
-		var frame = PanelContainer.new()
+		var frame = _create_padded_panel()
 		frame.add_child(row)
 		detail_panel.add_child(frame)
 
@@ -231,29 +254,30 @@ func _add_status_view(member):
 	row.add_child(defense)
 	row.add_child(speed)
 
-	var frame = PanelContainer.new()
+	var frame = _create_padded_panel()
 	frame.add_child(row)
 	detail_panel.add_child(frame)
 
 func _add_skills_view(member):
 	var list = VBoxContainer.new()
-	if member.skills.is_empty():
+	var available_skills = member.get_available_skills()
+	if available_skills.is_empty():
 		var none = Label.new()
 		none.text = "特技を覚えていません"
 		list.add_child(none)
 	else:
-		for skill in member.skills:
+		for skill in available_skills:
 			var skill_box = VBoxContainer.new()
 			var name = Label.new()
 			name.text = skill.get("name", "特技")
 			var cost = Label.new()
-			cost.text = "消費SP: %d" % skill.get("sp_cost", 0)
+			cost.text = SkillDatabase.get_menu_skill_cost_text(skill)
 			var effect = Label.new()
-			effect.text = _get_skill_description(skill)
+			effect.text = SkillDatabase.get_menu_skill_description(skill)
 			skill_box.add_child(name)
 			skill_box.add_child(cost)
 			skill_box.add_child(effect)
-			var frame = PanelContainer.new()
+			var frame = _create_padded_panel()
 			frame.add_child(skill_box)
 			list.add_child(frame)
 	detail_panel.add_child(list)
@@ -263,6 +287,27 @@ func _add_equipment_view(member):
 	stats.text = "攻撃: %d  防御: %d  素早さ: %d" % [member.attack, member.defense, member.speed]
 	detail_panel.add_child(stats)
 
+	var equipment_area = HBoxContainer.new()
+	equipment_area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	equipment_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	detail_panel.add_child(equipment_area)
+
+	var slot_list = VBoxContainer.new()
+	slot_list.custom_minimum_size = Vector2(260, 0)
+	equipment_area.add_child(slot_list)
+
+	equipment_preview_list = VBoxContainer.new()
+	equipment_preview_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	equipment_area.add_child(equipment_preview_list)
+
+	equipment_description_label = Label.new()
+	equipment_description_label.text = ""
+	equipment_description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var description_frame = _create_padded_panel()
+	description_frame.custom_minimum_size = Vector2(0, 72)
+	description_frame.add_child(equipment_description_label)
+	detail_panel.add_child(description_frame)
+
 	for slot_id in member.get_equipment_slot_ids():
 		var button = Button.new()
 		button.focus_mode = Control.FOCUS_ALL
@@ -271,8 +316,54 @@ func _add_equipment_view(member):
 		if item_id != "":
 			item_name = ItemDatabase.get_item_name(item_id)
 		button.text = "%s: %s" % [member.get_equipment_slot_name(slot_id), item_name]
+		button.focus_entered.connect(_update_equipment_slot_preview.bind(member, slot_id))
 		button.pressed.connect(_open_equipment_select.bind(slot_id))
-		detail_panel.add_child(button)
+		slot_list.add_child(button)
+
+	if !member.get_equipment_slot_ids().is_empty():
+		_update_equipment_slot_preview(member, member.get_equipment_slot_ids()[0])
+
+func _update_equipment_slot_preview(member, slot_id: String):
+	if equipment_preview_list == null or equipment_description_label == null:
+		return
+	for child in equipment_preview_list.get_children():
+		child.queue_free()
+
+	var slot_name = member.get_equipment_slot_name(slot_id)
+	var header = Label.new()
+	header.text = slot_name + "に装備できるアイテム"
+	equipment_preview_list.add_child(header)
+
+	var equipped_item_id = member.get_equipped_item_id(slot_id)
+	if equipped_item_id != "":
+		equipment_description_label.text = ItemDatabase.get_item_description(equipped_item_id)
+	else:
+		equipment_description_label.text = slot_name + "には何も装備していません"
+
+	_add_equipment_preview_row("なし", equipped_item_id == "", {})
+
+	var item_ids = InventoryManager.get_equipment_for_slot(slot_id, member.char_id)
+	for item_id in item_ids:
+		var item = ItemDatabase.get_item_data(item_id)
+		_add_equipment_preview_row(item.get("name", item_id), item_id == equipped_item_id, item)
+
+	if item_ids.is_empty():
+		var empty = Label.new()
+		empty.text = "装備できる所持品がありません"
+		equipment_preview_list.add_child(empty)
+
+func _add_equipment_preview_row(item_name: String, equipped: bool, _item: Dictionary):
+	var row = HBoxContainer.new()
+	var name = Label.new()
+	if equipped:
+		name.text = item_name + "（装備中）"
+	else:
+		name.text = item_name
+	row.add_child(name)
+
+	var frame = _create_padded_panel()
+	frame.add_child(row)
+	equipment_preview_list.add_child(frame)
 
 func _update_inventory_view():
 	for child in detail_panel.get_children():
@@ -303,14 +394,71 @@ func _update_inventory_view():
 			name = Label.new()
 		name.text = "%s x%d" % [item.get("name", item_id), inventory[item_id]]
 		var description = Label.new()
-		description.text = item.get("description", "")
+		description.text = ItemDatabase.get_item_description(item_id)
 		row.add_child(name)
 		row.add_child(description)
-		var frame = PanelContainer.new()
+		var frame = _create_padded_panel()
 		frame.add_child(row)
 		detail_panel.add_child(frame)
 
 	_connect_vertical_focus(item_buttons)
+
+func _update_option_view():
+	for child in detail_panel.get_children():
+		child.queue_free()
+
+	var header = Label.new()
+	header.text = "オプション"
+	detail_panel.add_child(header)
+
+	_add_volume_slider(
+		"全体音量",
+		OptionsManager.master_volume,
+		_on_master_volume_changed
+	)
+	_add_volume_slider(
+		"BGM音量",
+		OptionsManager.bgm_volume,
+		_on_bgm_volume_changed
+	)
+	_add_volume_slider(
+		"SE音量",
+		OptionsManager.se_volume,
+		_on_se_volume_changed
+	)
+
+func _add_volume_slider(label_text: String, value: int, callback: Callable):
+	var row = HBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+	var label = Label.new()
+	label.custom_minimum_size = Vector2(120, 0)
+	label.text = label_text
+	row.add_child(label)
+
+	var slider = HSlider.new()
+	slider.min_value = 0
+	slider.max_value = 100
+	slider.step = 1
+	slider.value = value
+	slider.focus_mode = Control.FOCUS_ALL
+	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(slider)
+
+	var value_label = Label.new()
+	value_label.custom_minimum_size = Vector2(48, 0)
+	value_label.text = str(value)
+	row.add_child(value_label)
+
+	slider.value_changed.connect(
+		func(new_value):
+			value_label.text = str(int(new_value))
+			callback.call(int(new_value))
+	)
+
+	var frame = _create_padded_panel()
+	frame.add_child(row)
+	detail_panel.add_child(frame)
 
 func _open_item_target_select(item_id: String):
 	pending_item_id = item_id
@@ -386,6 +534,24 @@ func _find_first_button(node):
 			return button
 	return null
 
+func _find_first_slider(node):
+	for child in node.get_children():
+		if child is HSlider:
+			return child
+		var slider = _find_first_slider(child)
+		if slider:
+			return slider
+	return null
+
+func _on_master_volume_changed(value: int):
+	OptionsManager.set_master_volume(value)
+
+func _on_bgm_volume_changed(value: int):
+	OptionsManager.set_bgm_volume(value)
+
+func _on_se_volume_changed(value: int):
+	OptionsManager.set_se_volume(value)
+
 func _connect_vertical_focus(buttons: Array):
 	for i in range(buttons.size()):
 		var button = buttons[i]
@@ -410,22 +576,42 @@ func _open_equipment_select(slot_id: String):
 	var unequip_button = Button.new()
 	unequip_button.text = "外す"
 	unequip_button.focus_mode = Control.FOCUS_ALL
+	unequip_button.focus_entered.connect(_set_equipment_select_description.bind("装備を外します"))
 	unequip_button.pressed.connect(_equip_selected_item.bind(""))
 	detail_panel.add_child(unequip_button)
 
-	var item_ids = InventoryManager.get_equipment_for_slot(slot_id)
+	var item_ids = InventoryManager.get_equipment_for_slot(slot_id, member.char_id)
 	for item_id in item_ids:
 		var item = ItemDatabase.get_item_data(item_id)
 		var button = Button.new()
 		button.focus_mode = Control.FOCUS_ALL
 		button.text = _get_equipment_button_text(item)
+		button.focus_entered.connect(_set_equipment_select_description.bind(ItemDatabase.get_item_description(item_id)))
 		button.pressed.connect(_equip_selected_item.bind(item_id))
 		detail_panel.add_child(button)
+
+	equipment_description_label = Label.new()
+	equipment_description_label.text = ""
+	equipment_description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var description_frame = _create_padded_panel()
+	description_frame.custom_minimum_size = Vector2(0, 72)
+	description_frame.add_child(equipment_description_label)
+	detail_panel.add_child(description_frame)
 
 	await get_tree().process_frame
 	unequip_button.grab_focus()
 
+func _set_equipment_select_description(text: String):
+	if equipment_description_label != null:
+		equipment_description_label.text = text
+
 func _get_equipment_button_text(item: Dictionary) -> String:
+	var stats_text = _get_equipment_stats_text(item)
+	if stats_text == "":
+		return item.get("name", "装備")
+	return "%s  %s" % [item.get("name", "装備"), stats_text]
+
+func _get_equipment_stats_text(item: Dictionary) -> String:
 	var stats = item.get("stats", {})
 	var bonuses := []
 	if int(stats.get("attack", 0)) != 0:
@@ -435,8 +621,8 @@ func _get_equipment_button_text(item: Dictionary) -> String:
 	if int(stats.get("speed", 0)) != 0:
 		bonuses.append(_format_stat_bonus("素早さ", int(stats.get("speed", 0))))
 	if bonuses.is_empty():
-		return item.get("name", "装備")
-	return "%s  %s" % [item.get("name", "装備"), _join_strings(bonuses, " ")]
+		return ""
+	return _join_strings(bonuses, " ")
 
 func _format_stat_bonus(label: String, value: int) -> String:
 	if value > 0:
@@ -451,8 +637,18 @@ func _join_strings(values: Array, separator: String) -> String:
 		text += str(values[i])
 	return text
 
+func _create_padded_panel() -> PanelContainer:
+	var frame = PanelContainer.new()
+	frame.add_theme_constant_override("margin_left", 10)
+	frame.add_theme_constant_override("margin_top", 8)
+	frame.add_theme_constant_override("margin_right", 10)
+	frame.add_theme_constant_override("margin_bottom", 8)
+	return frame
+
 func _equip_selected_item(item_id: String):
 	var member = current_party[selected_member_index]
+	if item_id != "" and !ItemDatabase.can_character_equip_item(item_id, equipment_select_slot, member.char_id):
+		return
 	if item_id != "" and !InventoryManager.give_item_to_equipment(item_id):
 		return
 	var old_item_id = member.equip_item(equipment_select_slot, item_id)
@@ -465,15 +661,6 @@ func _return_to_equipment_view():
 	showing_member_detail = true
 	detail_view = "equipment"
 	await _update_detail_panel(true)
-
-func _get_skill_description(skill):
-	var target = skill.get("target", "enemy")
-	var power = skill.get("power", 1.0)
-	if target == "enemy":
-		if skill.get("ignore_defense", false):
-			return "敵1体に攻撃力%.1f倍の防御無視ダメージ" % power
-		return "敵1体に攻撃力%.1f倍のダメージ" % power
-	return "対象: " + str(target)
 
 func _on_member_pressed(index):
 	selected_member_index = index

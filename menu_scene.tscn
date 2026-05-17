@@ -46,11 +46,24 @@ text = "キャラクター"
 layout_mode = 2
 text = "アイテム"
 
+[node name="OptionButton" type="Button" parent="PanelContainer/HBoxContainer/MenuCommands"]
+layout_mode = 2
+text = "オプション"
+
 [node name="PartyList" type="VBoxContainer" parent="PanelContainer/HBoxContainer"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 
-[node name="DetailPanel" type="VBoxContainer" parent="PanelContainer/HBoxContainer"]
+[node name="DetailPanel" type="MarginContainer" parent="PanelContainer/HBoxContainer"]
 custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Content" type="VBoxContainer" parent="PanelContainer/HBoxContainer/DetailPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

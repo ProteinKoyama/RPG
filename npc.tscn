@@ -1,14 +1,13 @@
-[gd_scene load_steps=13 format=3 uid="uid://bixgx6is1r0ad"]
+[gd_scene load_steps=12 format=3 uid="uid://bixgx6is1r0ad"]
 
 [ext_resource type="Script" uid="uid://bgqcj5rgps2tg" path="res://npc.gd" id="1_xxcha"]
-[ext_resource type="Resource" uid="uid://cnljyilgxdwof" path="res://tres/moeko.tres" id="2_ul7y6"]
 [ext_resource type="Texture2D" uid="uid://c1o76mhjglfq6" path="res://assets/charachip/Chara_doctor_common.png" id="3_kh24r"]
 [ext_resource type="Texture2D" uid="uid://cp2c5q2cfxfow" path="res://assets/charachip/Chara_Romachang.png" id="4_ul7y6"]
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_npc"]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
 size = Vector2(506.667, 650)
-
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_npc"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_back"]
 atlas = ExtResource("3_kh24r")
@@ -66,12 +65,11 @@ size = Vector2(158.333, 290.0005)
 
 [node name="NPC" type="StaticBody2D"]
 light_mask = 2
+position = Vector2(0.99999994, 0)
 scale = Vector2(0.2, 0.2)
 collision_layer = 2
-collision_mask = 1
 physics_material_override = SubResource("PhysicsMaterial_npc")
 script = ExtResource("1_xxcha")
-data = ExtResource("2_ul7y6")
 metadata/_edit_group_ = true
 
 [node name="InteractArea" type="Area2D" parent="."]

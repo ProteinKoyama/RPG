@@ -19,6 +19,9 @@ func _on_request_show_dialog(dialog_id: String) -> void:
 		EventManager.dialog_visible = false
 		return
 	var dialog_data = dialogs[dialog_id]
+	await show_dialog_data(dialog_data)
+
+func show_dialog_data(dialog_data: Array):
 	var dialog_root = dialog_scene.instantiate()
 	get_tree().current_scene.add_child(dialog_root)
 	dialog_root.setup(dialog_data)

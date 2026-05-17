@@ -24,12 +24,14 @@ EventManager="*res://event_manager.gd"
 BattleManager="*res://battle_manager.gd"
 PlayerManager="*res://player_manager.gd"
 EnemyDatabase="*res://enemy_database.gd"
+SkillDatabase="*res://skill_database.gd"
 ItemDatabase="*res://item_database.gd"
 InventoryManager="*res://inventory_manager.gd"
 PartyManager="*res://party_manager.gd"
 MenuManager="*res://menu_manager.gd"
 DialogManager="*res://dialog_manager.gd"
 CutsceneManager="*res://cutscene_manager.gd"
+OptionsManager="*res://options_manager.gd"
 
 [display]
 

@@ -1,11 +1,17 @@
-[gd_scene load_steps=18 format=4 uid="uid://bwarfbif7soh6"]
+[gd_scene load_steps=35 format=4 uid="uid://bwarfbif7soh6"]
 
 [ext_resource type="Texture2D" uid="uid://c1brha4ikrgcv" path="res://assets/tile1.png" id="1_jinkd"]
 [ext_resource type="Script" uid="uid://bgel4olso2gvl" path="res://room_scene.gd" id="1_ueye4"]
 [ext_resource type="Texture2D" uid="uid://ppexm72wshgh" path="res://assets/pictures/Base_BaseChip_pipo.png" id="3_nukew"]
 [ext_resource type="PackedScene" uid="uid://bixgx6is1r0ad" path="res://npc.tscn" id="5_atbl0"]
+[ext_resource type="Resource" uid="uid://cnljyilgxdwof" path="res://tres/moeko.tres" id="5_qfq5l"]
 [ext_resource type="Script" uid="uid://dguwd8iuyakui" path="res://npc_event_data.gd" id="5_w1efa"]
 [ext_resource type="Script" uid="uid://dl7ossnnwucgq" path="res://NPCData.gd" id="6_no7j0"]
+[ext_resource type="Texture2D" uid="uid://bf5nghmu36klf" path="res://assets/charachip/event_icon.png" id="7_no7j0"]
+[ext_resource type="Texture2D" uid="uid://dvxwrdaxxg1a6" path="res://assets/charachip/Chara_negako_common.png" id="8_2joa2"]
+[ext_resource type="Script" uid="uid://cgy21nut6sigv" path="res://npc_dialog_line_data.gd" id="9_grnmm"]
+[ext_resource type="Texture2D" uid="uid://dj2wli30c3jlo" path="res://assets/charachip/Chara_idol_common.png" id="10_faceq"]
+[ext_resource type="PackedScene" path="res://GenericEventArea.tscn" id="11_ir6st"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jqbpo"]
 texture = ExtResource("1_jinkd")
@@ -4085,6 +4091,8 @@ texture = ExtResource("3_nukew")
 7:248/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_2joa2"]
+physics_layer_0/collision_layer = 3
+physics_layer_0/collision_mask = 3
 sources/0 = SubResource("TileSetAtlasSource_no7j0")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_rgwj0"]
@@ -4155,7 +4163,9 @@ texture = ExtResource("3_nukew")
 6:0/0 = 0
 7:0/0 = 0
 0:1/0 = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 1:1/0 = 0
+1:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 2:1/0 = 0
 3:1/0 = 0
 4:1/0 = 0
@@ -4163,7 +4173,9 @@ texture = ExtResource("3_nukew")
 6:1/0 = 0
 7:1/0 = 0
 0:2/0 = 0
+0:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 1:2/0 = 0
+1:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 2:2/0 = 0
 3:2/0 = 0
 4:2/0 = 0
@@ -4171,7 +4183,9 @@ texture = ExtResource("3_nukew")
 6:2/0 = 0
 7:2/0 = 0
 0:3/0 = 0
+0:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 1:3/0 = 0
+1:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 2:3/0 = 0
 3:3/0 = 0
 4:3/0 = 0
@@ -4179,7 +4193,9 @@ texture = ExtResource("3_nukew")
 6:3/0 = 0
 7:3/0 = 0
 0:4/0 = 0
+0:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 1:4/0 = 0
+1:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 2:4/0 = 0
 3:4/0 = 0
 4:4/0 = 0
@@ -6139,22 +6155,116 @@ texture = ExtResource("3_nukew")
 7:248/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_ikw7k"]
+physics_layer_0/collision_layer = 3
+physics_layer_0/collision_mask = 3
 sources/0 = SubResource("TileSetAtlasSource_rgwj0")
 sources/1 = SubResource("TileSetAtlasSource_w1efa")
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_glo7x"]
-size = Vector2(147, 67)
 
 [sub_resource type="Resource" id="Resource_w1efa"]
 script = ExtResource("5_w1efa")
 event_type = "battle"
 battle_enemy_ids = Array[String](["slime", "shadow"])
+battle_bgm_path = null
+battle_escape_enabled = null
 metadata/_custom_type_script = "uid://dguwd8iuyakui"
 
 [sub_resource type="Resource" id="Resource_2joa2"]
 script = ExtResource("6_no7j0")
 events = Array[ExtResource("5_w1efa")]([SubResource("Resource_w1efa")])
 metadata/_custom_type_script = "uid://dl7ossnnwucgq"
+
+[sub_resource type="Resource" id="Resource_ojhy0"]
+script = ExtResource("5_w1efa")
+event_type = "item"
+item_id = "potion"
+show_item_dialog = true
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_no7j0"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_no7j0")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Resource" id="Resource_grnmm"]
+script = ExtResource("6_no7j0")
+sprite_frames = SubResource("SpriteFrames_no7j0")
+events = Array[ExtResource("5_w1efa")]([SubResource("Resource_ojhy0")])
+metadata/_custom_type_script = "uid://dl7ossnnwucgq"
+
+[sub_resource type="Resource" id="Resource_faceq"]
+script = ExtResource("5_w1efa")
+event_type = "join"
+member_id = "sakuraba"
+show_join_dialog = true
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ir6st"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_2joa2")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Resource" id="Resource_qfq5l"]
+script = ExtResource("6_no7j0")
+portrait = ExtResource("8_2joa2")
+sprite_frames = SubResource("SpriteFrames_ir6st")
+events = Array[ExtResource("5_w1efa")]([SubResource("Resource_faceq")])
+metadata/_custom_type_script = "uid://dl7ossnnwucgq"
+
+[sub_resource type="Resource" id="Resource_ir6st"]
+script = ExtResource("9_grnmm")
+speaker_name = "モエ子"
+message = "テストメッセージなんだからね！"
+metadata/_custom_type_script = "uid://cgy21nut6sigv"
+
+[sub_resource type="Resource" id="Resource_tqxta"]
+script = ExtResource("5_w1efa")
+event_type = "direct_talk"
+direct_dialog_lines = Array[Resource]([SubResource("Resource_ir6st")])
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_faceq"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_faceq")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Resource" id="Resource_lomdf"]
+script = ExtResource("6_no7j0")
+portrait = ExtResource("10_faceq")
+sprite_frames = SubResource("SpriteFrames_faceq")
+events = Array[ExtResource("5_w1efa")]([SubResource("Resource_tqxta")])
+metadata/_custom_type_script = "uid://dl7ossnnwucgq"
+
+[sub_resource type="Resource" id="Resource_kiu8u"]
+script = ExtResource("5_w1efa")
+event_type = "map"
+map_scene_path = "res://scenes/debug_room.tscn"
+map_spawn_point = "PlayerSpawnPoint"
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="Resource" id="Resource_wxayw"]
+script = ExtResource("5_w1efa")
+event_type = "map"
+map_scene_path = "uid://kaeiaq1bkmck"
+map_spawn_point = "FromMyRoom"
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
 
 [node name="RoomScene" type="Node"]
 script = ExtResource("1_ueye4")
@@ -6176,13 +6286,6 @@ scale = Vector2(2.3, 2.3)
 tile_map_data = PackedByteArray("AAAKAAgAAQAAAAMAAAAKAAkAAQAAAAQAAAALAAgAAQABAAMAAAALAAkAAQABAAQAAAA=")
 tile_set = SubResource("TileSet_ikw7k")
 
-[node name="Area2D" type="Area2D" parent="Room"]
-position = Vector2(-49, 176)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Room/Area2D"]
-position = Vector2(523.5, 656.5)
-shape = SubResource("RectangleShape2D_glo7x")
-
 [node name="PlayerSpawnPoint" type="Marker2D" parent="."]
 position = Vector2(590, 264)
 
@@ -6193,9 +6296,32 @@ position = Vector2(523, 586)
 
 [node name="NPC" parent="." instance=ExtResource("5_atbl0")]
 position = Vector2(715.99994, 194.99998)
+data = ExtResource("5_qfq5l")
 
 [node name="NPC2" parent="." instance=ExtResource("5_atbl0")]
 position = Vector2(718, 387)
 data = SubResource("Resource_2joa2")
 
-[connection signal="body_entered" from="Room/Area2D" to="." method="_on_area_2d_body_entered"]
+[node name="NPC3" parent="." instance=ExtResource("5_atbl0")]
+position = Vector2(531, 141)
+scale = Vector2(0.1, 0.1)
+data = SubResource("Resource_grnmm")
+
+[node name="NPC4" parent="." instance=ExtResource("5_atbl0")]
+position = Vector2(611, 193)
+data = SubResource("Resource_qfq5l")
+
+[node name="NPC5" parent="." instance=ExtResource("5_atbl0")]
+position = Vector2(458.99997, 390.99997)
+data = SubResource("Resource_lomdf")
+
+[node name="GenericEventArea" parent="." instance=ExtResource("11_ir6st")]
+position = Vector2(610, 535)
+trigger_mode = "enter"
+events = Array[ExtResource("5_w1efa")]([SubResource("Resource_kiu8u")])
+
+[node name="GenericEventArea2" parent="." instance=ExtResource("11_ir6st")]
+position = Vector2(517, 649)
+scale = Vector2(2, 0.5)
+trigger_mode = "enter"
+events = Array[ExtResource("5_w1efa")]([SubResource("Resource_wxayw")])

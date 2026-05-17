@@ -6,16 +6,18 @@
 
 [sub_resource type="Resource" id="Resource_ojhy0"]
 script = ExtResource("1_ojhy0")
-dialog_id = "npc_moeko_add"
+event_type = "direct_talk"
+direct_dialog_lines = Array[Resource]([null])
 metadata/_custom_type_script = "uid://dguwd8iuyakui"
 
 [sub_resource type="Resource" id="Resource_n7fx4"]
 script = ExtResource("1_ojhy0")
 event_type = "join"
 member_id = "moeko"
+show_join_dialog = true
 metadata/_custom_type_script = "uid://dguwd8iuyakui"
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_fke23"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_ojhy0"]
 animations = [{
 "frames": [{
 "duration": 1.0,
@@ -29,6 +31,6 @@ animations = [{
 [resource]
 script = ExtResource("1_uasbe")
 portrait = ExtResource("1_ejn60")
-sprite_frames = SubResource("SpriteFrames_fke23")
+sprite_frames = SubResource("SpriteFrames_ojhy0")
 events = Array[ExtResource("1_ojhy0")]([SubResource("Resource_ojhy0"), SubResource("Resource_n7fx4")])
 metadata/_custom_type_script = "uid://dl7ossnnwucgq"

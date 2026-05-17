@@ -1,0 +1,77 @@
+{
+	"power_strike": {
+		"id": "power_strike",
+		"name": "強打",
+		"sp_cost": 1,
+		"target": "enemy",
+		"power": 3.0
+	},
+	"vibrato": {
+		"id": "vibrato",
+		"name": "ビブラート",
+		"sp_cost": 1,
+		"target": "ally",
+		"effect_type": "heal_hp",
+		"heal_amount": 30
+	},
+	"pierce_attack": {
+		"id": "pierce_attack",
+		"name": "貫通攻撃",
+		"sp_cost": 1,
+		"target": "enemy",
+		"power": 1.5,
+		"ignore_defense": true
+	},
+	"dark_cleave": {
+		"id": "dark_cleave",
+		"name": "闇薙",
+		"sp_cost": 0,
+		"target": "all_enemies",
+		"effect_type": "fixed_damage",
+		"fixed_damage": 1000,
+		"ignore_defense": true
+	},
+	"crying_plea": {
+		"id": "crying_plea",
+		"name": "泣き落とし",
+		"sp_cost": 1,
+		"target": "all_enemies",
+		"effect_type": "status",
+		"status_id": "mental_weakness",
+		"turns": -1
+	},
+	"tackle": {
+		"id": "tackle",
+		"name": "タックル",
+		"sp_cost": 0,
+		"hp_cost": 30,
+		"target": "enemy",
+		"effect_type": "fixed_damage",
+		"fixed_damage": 60
+	},
+	"determination": {
+		"id": "determination",
+		"name": "決意",
+		"sp_cost": 1,
+		"target": "self",
+		"effect_type": "damage_reduction",
+		"reduction_rate": 0.5,
+		"attack_rate": 1.5,
+		"turns": 3
+	},
+	"acid": {
+		"id": "acid",
+		"name": "酸攻撃",
+		"sp_cost": 1,
+		"target": "enemy",
+		"power": 1.8
+	},
+	"shadow_pierce": {
+		"id": "shadow_pierce",
+		"name": "影抜き",
+		"sp_cost": 2,
+		"target": "enemy",
+		"power": 1.2,
+		"ignore_defense": true
+	}
+}

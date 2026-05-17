@@ -64,13 +64,16 @@ func use_item(item_id: String, target, in_battle := false) -> bool:
 		return true
 	return remove_item(item_id, 1)
 
-func get_equipment_for_slot(slot_id: String) -> Array:
+func get_equipment_for_slot(slot_id: String, character_id := "") -> Array:
 	var result := []
 	var item_database = _get_item_database()
 	if item_database == null:
 		return result
 	for item_id in items.keys():
-		if get_item_count(item_id) > 0 and item_database.can_equip_to_slot(item_id, slot_id):
+		var can_equip = item_database.can_equip_to_slot(item_id, slot_id)
+		if character_id != "":
+			can_equip = item_database.can_character_equip_item(item_id, slot_id, character_id)
+		if get_item_count(item_id) > 0 and can_equip:
 			result.append(item_id)
 	return result
 

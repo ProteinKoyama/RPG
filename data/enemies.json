@@ -9,13 +9,7 @@
 		"speed": 3,
 		"image": "assets/pictures/slime.png",
 		"skills": [
-			{
-				"id": "acid",
-				"name": "酸攻撃",
-				"sp_cost": 1,
-				"target": "enemy",
-				"power": 1.8
-			}
+			"acid"
 		],
 		"ai_rules": [
 			{
@@ -54,15 +48,9 @@
 		"attack": 20,
 		"defense": 10,
 		"speed": 15,
+		"image": "assets/pictures/shadow.png",
 		"skills": [
-			{
-				"id": "shadow_pierce",
-				"name": "影抜き",
-				"sp_cost": 2,
-				"target": "enemy",
-				"power": 1.2,
-				"ignore_defense": true
-			}
+			"shadow_pierce"
 		],
 		"ai_rules": [
 			{

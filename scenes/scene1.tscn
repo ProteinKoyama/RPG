@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=4 uid="uid://kaeiaq1bkmck"]
+[gd_scene load_steps=10 format=4 uid="uid://kaeiaq1bkmck"]
 
 [ext_resource type="Script" uid="uid://cftdiv11gd5ok" path="res://scenes/scene1.gd" id="1_q3myb"]
 [ext_resource type="Texture2D" uid="uid://c1brha4ikrgcv" path="res://assets/tile1.png" id="2_007yp"]
-[ext_resource type="PackedScene" uid="uid://c38ogu73ftn1o" path="res://roma.tscn" id="3_dh1pk"]
+[ext_resource type="PackedScene" path="res://GenericEventArea.tscn" id="3_dc6gq"]
+[ext_resource type="Script" uid="uid://dguwd8iuyakui" path="res://npc_event_data.gd" id="4_cg05x"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_dc6gq"]
 texture = ExtResource("2_007yp")
@@ -147,8 +148,12 @@ texture = ExtResource("2_007yp")
 [sub_resource type="TileSet" id="TileSet_s8jmr"]
 sources/0 = SubResource("TileSetAtlasSource_ogaks")
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_007yp"]
-size = Vector2(49, 89)
+[sub_resource type="Resource" id="Resource_ogaks"]
+script = ExtResource("4_cg05x")
+event_type = "map"
+map_scene_path = "uid://bwarfbif7soh6"
+map_spawn_point = "FromScene1"
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
 
 [node name="Scene1" type="Node"]
 script = ExtResource("1_q3myb")
@@ -169,15 +174,6 @@ tile_set = SubResource("TileSet_s8jmr")
 [node name="FromMyRoom" type="Marker2D" parent="."]
 position = Vector2(101, 556)
 
-[node name="ToMyRoom" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ToMyRoom"]
-position = Vector2(99.5, 541.5)
-shape = SubResource("RectangleShape2D_007yp")
-
-[node name="Roma" parent="." instance=ExtResource("3_dh1pk")]
-position = Vector2(198, 538.00006)
-
-[connection signal="body_entered" from="ToMyRoom" to="." method="_on_to_my_room_body_entered"]
-[connection signal="body_exited" from="ToMyRoom" to="." method="_on_to_my_room_body_exited"]
-[connection signal="character_interacted_signal" from="Roma" to="." method="_on_roma_character_interacted_signal"]
+[node name="GenericEventArea" parent="." instance=ExtResource("3_dc6gq")]
+position = Vector2(98, 523)
+events = Array[ExtResource("4_cg05x")]([SubResource("Resource_ogaks")])

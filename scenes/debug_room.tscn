@@ -1,0 +1,196 @@
+[gd_scene load_steps=14 format=4]
+
+[ext_resource type="Script" path="res://map_base.gd" id="1_map_base"]
+[ext_resource type="PackedScene" path="res://GenericEventArea.tscn" id="2_generic_event_area"]
+[ext_resource type="Script" path="res://npc_event_data.gd" id="3_npc_event_data"]
+[ext_resource type="Script" path="res://npc_dialog_line_data.gd" id="4_dialog_line"]
+
+[sub_resource type="Resource" id="Resource_talk_line"]
+script = ExtResource("4_dialog_line")
+speaker_name = "デバッグ"
+message = "これはインタラクトで表示する会話イベントです。"
+metadata/_custom_type_script = "uid://cgy21nut6sigv"
+
+[sub_resource type="Resource" id="Resource_enter_line"]
+script = ExtResource("4_dialog_line")
+speaker_name = "デバッグ"
+message = "これは範囲に入った瞬間に発生するイベントです。"
+metadata/_custom_type_script = "uid://cgy21nut6sigv"
+
+[sub_resource type="Resource" id="Resource_talk_event"]
+script = ExtResource("3_npc_event_data")
+event_type = "direct_talk"
+direct_dialog_lines = Array[Resource]([SubResource("Resource_talk_line")])
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="Resource" id="Resource_enter_event"]
+script = ExtResource("3_npc_event_data")
+event_type = "direct_talk"
+direct_dialog_lines = Array[Resource]([SubResource("Resource_enter_line")])
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="Resource" id="Resource_item_event"]
+script = ExtResource("3_npc_event_data")
+event_type = "item"
+item_id = "potion"
+item_amount = 1
+show_item_dialog = true
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="Resource" id="Resource_battle_event"]
+script = ExtResource("3_npc_event_data")
+event_type = "battle"
+battle_enemy_ids = Array[String](["slime"])
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="Resource" id="Resource_map_event"]
+script = ExtResource("3_npc_event_data")
+event_type = "map"
+map_scene_path = "res://scenes/room_scene.tscn"
+map_spawn_point = "PlayerSpawnPoint"
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_horizontal"]
+size = Vector2(768, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_vertical"]
+size = Vector2(32, 512)
+
+[node name="DebugRoom" type="Node2D"]
+script = ExtResource("1_map_base")
+
+[node name="Floor" type="Polygon2D" parent="."]
+color = Color(0.11, 0.13, 0.15, 1)
+polygon = PackedVector2Array(-32, -32, 736, -32, 736, 480, -32, 480)
+
+[node name="TileLayers" type="Node2D" parent="."]
+
+[node name="Ground" type="TileMapLayer" parent="TileLayers"]
+
+[node name="Objects" type="TileMapLayer" parent="TileLayers"]
+
+[node name="Upper" type="TileMapLayer" parent="TileLayers"]
+z_index = 10
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="PlayerSpawnPoint" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(64, 64)
+
+[node name="FromPreviousMap" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(128, 64)
+
+[node name="EventAreas" type="Node2D" parent="."]
+
+[node name="TalkEvent" parent="EventAreas" instance=ExtResource("2_generic_event_area")]
+position = Vector2(160, 160)
+trigger_mode = "interact"
+events = Array[ExtResource("3_npc_event_data")]([SubResource("Resource_talk_event")])
+event_size = Vector2(96, 96)
+
+[node name="Visual" type="Polygon2D" parent="EventAreas/TalkEvent"]
+color = Color(0.15, 0.38, 0.68, 0.55)
+polygon = PackedVector2Array(-48, -48, 48, -48, 48, 48, -48, 48)
+
+[node name="Label" type="Label" parent="EventAreas/TalkEvent"]
+offset_left = -48.0
+offset_top = -76.0
+offset_right = 96.0
+offset_bottom = -50.0
+text = "Talk"
+
+[node name="ItemEvent" parent="EventAreas" instance=ExtResource("2_generic_event_area")]
+position = Vector2(320, 160)
+trigger_mode = "interact"
+events = Array[ExtResource("3_npc_event_data")]([SubResource("Resource_item_event")])
+one_shot = true
+event_size = Vector2(96, 96)
+
+[node name="Visual" type="Polygon2D" parent="EventAreas/ItemEvent"]
+color = Color(0.18, 0.58, 0.28, 0.55)
+polygon = PackedVector2Array(-48, -48, 48, -48, 48, 48, -48, 48)
+
+[node name="Label" type="Label" parent="EventAreas/ItemEvent"]
+offset_left = -48.0
+offset_top = -76.0
+offset_right = 96.0
+offset_bottom = -50.0
+text = "Item"
+
+[node name="BattleEvent" parent="EventAreas" instance=ExtResource("2_generic_event_area")]
+position = Vector2(480, 160)
+trigger_mode = "interact"
+events = Array[ExtResource("3_npc_event_data")]([SubResource("Resource_battle_event")])
+event_size = Vector2(96, 96)
+
+[node name="Visual" type="Polygon2D" parent="EventAreas/BattleEvent"]
+color = Color(0.70, 0.18, 0.22, 0.55)
+polygon = PackedVector2Array(-48, -48, 48, -48, 48, 48, -48, 48)
+
+[node name="Label" type="Label" parent="EventAreas/BattleEvent"]
+offset_left = -48.0
+offset_top = -76.0
+offset_right = 96.0
+offset_bottom = -50.0
+text = "Battle"
+
+[node name="EnterEvent" parent="EventAreas" instance=ExtResource("2_generic_event_area")]
+position = Vector2(160, 320)
+trigger_mode = "enter"
+events = Array[ExtResource("3_npc_event_data")]([SubResource("Resource_enter_event")])
+event_size = Vector2(96, 96)
+
+[node name="Visual" type="Polygon2D" parent="EventAreas/EnterEvent"]
+color = Color(0.68, 0.46, 0.14, 0.55)
+polygon = PackedVector2Array(-48, -48, 48, -48, 48, 48, -48, 48)
+
+[node name="Label" type="Label" parent="EventAreas/EnterEvent"]
+offset_left = -48.0
+offset_top = -76.0
+offset_right = 96.0
+offset_bottom = -50.0
+text = "Enter"
+
+[node name="MapEvent" parent="EventAreas" instance=ExtResource("2_generic_event_area")]
+position = Vector2(480, 320)
+trigger_mode = "interact"
+events = Array[ExtResource("3_npc_event_data")]([SubResource("Resource_map_event")])
+event_size = Vector2(96, 96)
+
+[node name="Visual" type="Polygon2D" parent="EventAreas/MapEvent"]
+color = Color(0.48, 0.28, 0.75, 0.55)
+polygon = PackedVector2Array(-48, -48, 48, -48, 48, 48, -48, 48)
+
+[node name="Label" type="Label" parent="EventAreas/MapEvent"]
+offset_left = -48.0
+offset_top = -76.0
+offset_right = 120.0
+offset_bottom = -50.0
+text = "Map"
+
+[node name="NPCs" type="Node2D" parent="."]
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="Walls" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+
+[node name="Top" type="CollisionShape2D" parent="Walls"]
+position = Vector2(352, -16)
+shape = SubResource("RectangleShape2D_wall_horizontal")
+
+[node name="Bottom" type="CollisionShape2D" parent="Walls"]
+position = Vector2(352, 496)
+shape = SubResource("RectangleShape2D_wall_horizontal")
+
+[node name="Left" type="CollisionShape2D" parent="Walls"]
+position = Vector2(-16, 224)
+shape = SubResource("RectangleShape2D_wall_vertical")
+
+[node name="Right" type="CollisionShape2D" parent="Walls"]
+position = Vector2(752, 224)
+shape = SubResource("RectangleShape2D_wall_vertical")
+
+[node name="BGMPlayer" type="AudioStreamPlayer" parent="."]
+bus = &"BGM"

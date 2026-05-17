@@ -1,7 +1,7 @@
 extends Node
 
 signal request_show_dialog(dialog_id)
-signal battle_requested(enemy_ids)
+signal battle_requested(enemy_ids, battle_bgm_path, escape_enabled)
 signal cutscene_requested(event_keys)
 var opening_done := false
 var dialog_visible := false
@@ -18,7 +18,7 @@ func dialog_closed():
 	PlayerManager.can_move = true
 	dialog_visible = false
 
-func start_battle(enemy_ids):
+func start_battle(enemy_ids, battle_bgm_path := "", escape_enabled := true):
 	if PlayerManager.in_battle:
 		print("battle request ignored: already in battle")
 		return
@@ -26,7 +26,7 @@ func start_battle(enemy_ids):
 	PlayerManager.can_move = false
 	PlayerManager.in_battle = true
 	PlayerManager.stop_player_animation()
-	emit_signal("battle_requested", enemy_ids)
+	emit_signal("battle_requested", enemy_ids, battle_bgm_path, escape_enabled)
 	var result = await BattleManager.battle_finished
 	return result
 func _on_battle_finished(result):
@@ -39,6 +39,8 @@ func start_cutscene(event_keys) -> void:
 	print("cutscene requested")
 	if cutscene_manager != null:
 		await cutscene_manager.cutscene_finished
+	if !PlayerManager.in_battle:
+		PlayerManager.can_move = true
 
 func _get_cutscene_manager():
 	var tree = Engine.get_main_loop()

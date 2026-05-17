@@ -1,9 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://cvdsvwcfvooh5"]
+[gd_scene load_steps=3 format=3 uid="uid://cvdsvwcfvooh5"]
 
 [ext_resource type="Script" uid="uid://bbr0a4i5iu2ce" path="res://party_status.gd" id="1_vo5t0"]
+[ext_resource type="Texture2D" path="res://assets/pictures/charcut_girl.png" id="2_girl_face"]
 
 [node name="PartyStatus" type="Control"]
-custom_minimum_size = Vector2(100, 270)
+custom_minimum_size = Vector2(220, 270)
 layout_direction = 2
 layout_mode = 3
 anchors_preset = 15
@@ -13,30 +14,11 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_vo5t0")
 
-[node name="NameLabel" type="Label" parent="."]
-layout_mode = 0
-offset_right = 72.0
-offset_bottom = 23.0
-text = "キャラ"
-
-[node name="StatusBars" type="VBoxContainer" parent="."]
-layout_mode = 0
-offset_top = 27.0
-offset_right = 72.0
-offset_bottom = 77.0
-
-[node name="HPText" type="Label" parent="StatusBars"]
-layout_mode = 2
-text = "HP 0/0"
-
-[node name="SPText" type="Label" parent="StatusBars"]
-layout_mode = 2
-text = "SP 0/0"
-
 [node name="ActionCommands" type="VBoxContainer" parent="."]
 layout_mode = 0
-offset_top = 81.0
-offset_right = 72.0
+offset_left = 0.0
+offset_top = 100.0
+offset_right = 88.0
 offset_bottom = 270.0
 size_flags_stretch_ratio = 0.0
 
@@ -59,6 +41,72 @@ text = "防御"
 [node name="ItemButton" type="Button" parent="ActionCommands"]
 layout_mode = 2
 text = "アイテム"
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 0
+offset_right = 88.0
+offset_bottom = 23.0
+text = "キャラ"
+
+[node name="StatusBars" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_top = 27.0
+offset_right = 88.0
+offset_bottom = 77.0
+
+[node name="HPText" type="Label" parent="StatusBars"]
+layout_mode = 2
+text = "HP 0/0"
+
+[node name="SPText" type="Label" parent="StatusBars"]
+layout_mode = 2
+text = "SP 0/0"
+
+[node name="FaceSlot" type="Control" parent="."]
+layout_mode = 0
+offset_left = 96.0
+offset_top = 0.0
+offset_right = 220.0
+offset_bottom = 270.0
+mouse_filter = 2
+
+[node name="FacePlaceholder" type="Panel" parent="FaceSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FaceGraphic" type="TextureRect" parent="FaceSlot"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_girl_face")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="EffectText" type="Label" parent="FaceSlot"]
+z_index = 10
+self_modulate = Color(1, 1, 1, 0.5)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = 120.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+text = ""
+autowrap_mode = 3
 
 [connection signal="pressed" from="ActionCommands/AttackButton" to="." method="_on_attack_button_pressed"]
 [connection signal="pressed" from="ActionCommands/SkillButton" to="." method="_on_skill_button_pressed"]
