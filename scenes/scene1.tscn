@@ -1,9 +1,13 @@
-[gd_scene load_steps=10 format=4 uid="uid://kaeiaq1bkmck"]
+[gd_scene load_steps=27 format=4 uid="uid://kaeiaq1bkmck"]
 
 [ext_resource type="Script" uid="uid://cftdiv11gd5ok" path="res://scenes/scene1.gd" id="1_q3myb"]
 [ext_resource type="Texture2D" uid="uid://c1brha4ikrgcv" path="res://assets/tile1.png" id="2_007yp"]
 [ext_resource type="PackedScene" path="res://GenericEventArea.tscn" id="3_dc6gq"]
 [ext_resource type="Script" uid="uid://dguwd8iuyakui" path="res://npc_event_data.gd" id="4_cg05x"]
+[ext_resource type="PackedScene" uid="uid://bixgx6is1r0ad" path="res://npc.tscn" id="5_intro_npc"]
+[ext_resource type="Script" uid="uid://dl7ossnnwucgq" path="res://NPCData.gd" id="7_intro_data"]
+[ext_resource type="SpriteFrames" uid="uid://b1sjmprbk51a5" path="res://tres/doctor.tres" id="7_suuxx"]
+[ext_resource type="Script" uid="uid://cgy21nut6sigv" path="res://npc_dialog_line_data.gd" id="8_intro_line"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_dc6gq"]
 texture = ExtResource("2_007yp")
@@ -148,6 +152,88 @@ texture = ExtResource("2_007yp")
 [sub_resource type="TileSet" id="TileSet_s8jmr"]
 sources/0 = SubResource("TileSetAtlasSource_ogaks")
 
+[sub_resource type="Resource" id="Resource_scene1_npc_first_line_1"]
+script = ExtResource("8_intro_line")
+speaker_name = "NPC"
+message = "直接話しかけてくれたんだね。"
+metadata/_custom_type_script = "res://npc_dialog_line_data.gd"
+
+[sub_resource type="Resource" id="Resource_scene1_npc_first_line_2"]
+script = ExtResource("8_intro_line")
+speaker_name = "NPC"
+message = "この会話は、NPCに話しかけた最初の一回だけ表示されるよ。"
+metadata/_custom_type_script = "res://npc_dialog_line_data.gd"
+
+[sub_resource type="Resource" id="Resource_scene1_npc_first_talk"]
+script = ExtResource("4_cg05x")
+event_type = "direct_talk"
+direct_dialog_lines = Array[Resource]([SubResource("Resource_scene1_npc_first_line_1"), SubResource("Resource_scene1_npc_first_line_2")])
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="Resource" id="Resource_scene1_npc_talk_flag"]
+script = ExtResource("4_cg05x")
+event_type = "flag"
+flag_key = "scene1_npc_talk_done"
+flag_key = "scene1_npc_talk_done"
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="Resource" id="Resource_scene1_repeat_line_1"]
+script = ExtResource("8_intro_line")
+speaker_name = "NPC"
+message = "また来たんだね。"
+metadata/_custom_type_script = "res://npc_dialog_line_data.gd"
+
+[sub_resource type="Resource" id="Resource_scene1_repeat_line_2"]
+script = ExtResource("8_intro_line")
+speaker_name = "NPC"
+message = "もう初回の案内は済んだから、あとは自由に見ていって。"
+metadata/_custom_type_script = "res://npc_dialog_line_data.gd"
+
+[sub_resource type="Resource" id="Resource_scene1_repeat_talk"]
+script = ExtResource("4_cg05x")
+event_type = "direct_talk"
+direct_dialog_lines = Array[Resource]([SubResource("Resource_scene1_repeat_line_1"), SubResource("Resource_scene1_repeat_line_2")])
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="Resource" id="Resource_scene1_npc_talk_branch"]
+script = ExtResource("4_cg05x")
+event_type = "flag_branch"
+branch_flag_key = "scene1_npc_talk_done"
+branch_true_events = Array[Resource]([SubResource("Resource_scene1_repeat_talk")])
+branch_false_events = Array[Resource]([SubResource("Resource_scene1_npc_first_talk"), SubResource("Resource_scene1_npc_talk_flag")])
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="Resource" id="Resource_scene1_intro_npc_data"]
+script = ExtResource("7_intro_data")
+sprite_frames = ExtResource("7_suuxx")
+events = Array[ExtResource("4_cg05x")]([SubResource("Resource_scene1_npc_talk_branch")])
+metadata/_custom_type_script = "uid://dl7ossnnwucgq"
+
+[sub_resource type="Resource" id="Resource_scene1_intro_line_1"]
+script = ExtResource("8_intro_line")
+speaker_name = "NPC"
+message = "待って。ここはScene1だよ。"
+metadata/_custom_type_script = "res://npc_dialog_line_data.gd"
+
+[sub_resource type="Resource" id="Resource_scene1_intro_line_2"]
+script = ExtResource("8_intro_line")
+speaker_name = "NPC"
+message = "この先へ進む前に、周りを少し見ていくといいかも。"
+metadata/_custom_type_script = "res://npc_dialog_line_data.gd"
+
+[sub_resource type="Resource" id="Resource_scene1_intro_talk"]
+script = ExtResource("4_cg05x")
+event_type = "direct_talk"
+direct_dialog_lines = Array[Resource]([SubResource("Resource_scene1_intro_line_1"), SubResource("Resource_scene1_intro_line_2")])
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
+[sub_resource type="Resource" id="Resource_scene1_intro_flag"]
+script = ExtResource("4_cg05x")
+event_type = "flag"
+flag_key = "scene1_intro_done"
+flag_key = "scene1_intro_done"
+metadata/_custom_type_script = "uid://dguwd8iuyakui"
+
 [sub_resource type="Resource" id="Resource_ogaks"]
 script = ExtResource("4_cg05x")
 event_type = "map"
@@ -168,11 +254,25 @@ use_kinematic_bodies = true
 collision_visibility_mode = 2
 
 [node name="TileMapLayer" type="TileMapLayer" parent="Map/Map1"]
-tile_map_data = PackedByteArray("AAACACsAAAAFAAYAAAACACwAAAAFAAcAAAADACsAAAAGAAYAAAADACwAAAAGAAcAAAACACoAAAAFAAUAAAADACoAAAAGAAUAAAA=")
+tile_map_data = PackedByteArray("AAACACsAAAAFAAYAAAACACwAAAAFAAcAAAADACsAAAAGAAYAAAADACwAAAAGAAcAAAACACoAAAAFAAUAAAADACoAAAAGAAUAAAAUACoAAAAFAAUAAAAUACsAAAAFAAYAAAAUACwAAAAFAAcAAAAVACoAAAAGAAUAAAAVACsAAAAGAAYAAAAVACwAAAAGAAcAAAA=")
 tile_set = SubResource("TileSet_s8jmr")
 
 [node name="FromMyRoom" type="Marker2D" parent="."]
 position = Vector2(101, 556)
+
+[node name="IntroNPC" parent="." instance=ExtResource("5_intro_npc")]
+position = Vector2(181, 551)
+data = SubResource("Resource_scene1_intro_npc_data")
+
+[node name="Scene1IntroEvent" parent="." instance=ExtResource("3_dc6gq")]
+position = Vector2(101, 556)
+trigger_mode = "enter"
+events = Array[ExtResource("4_cg05x")]([SubResource("Resource_scene1_intro_talk"), SubResource("Resource_scene1_intro_flag")])
+one_shot = true
+disable_if_flag_key = "scene1_intro_done"
+trigger_animation_node_path = NodePath("../IntroNPC")
+trigger_animation_name = "face_player"
+event_size = Vector2(220, 180)
 
 [node name="GenericEventArea" parent="." instance=ExtResource("3_dc6gq")]
 position = Vector2(98, 523)

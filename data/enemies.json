@@ -79,5 +79,63 @@
 				"action": "attack"
 			}
 		]
+	},
+
+	"enemy_moeko": {
+		"name": "モエ子",
+		"hp": 100,
+		"sp": 3,
+		"initial_sp": 0,
+		"attack": 10,
+		"defense": 10,
+		"speed": 50,
+		"image": "assets/pictures/moeko.png",
+		"skills": [
+			"shout"
+		],
+		"ai_rules": [
+			{
+				"priority": 100,
+				"condition": "always",
+				"action": "skill",
+				"skill_id": "shout"
+			},
+			{
+				"priority": 90,
+				"condition": "sp_below_skill",
+				"skill_id": "shout",
+				"action": "charge"
+			},
+			{
+				"priority": 0,
+				"condition": "always",
+				"action": "attack"
+			}
+		]
+	},
+
+	"speaker": {
+		"name": "スピーカー",
+		"hp": 40,
+		"sp": 3,
+		"initial_sp": 0,
+		"attack": 8,
+		"defense": 10,
+		"speed": 12,
+		"image": "assets/pictures/speaker.png",
+		"element_weaknesses": {
+			"electric": 2.0
+		},
+		"skills": [
+			"howling"
+		],
+		"ai_rules": [
+			{
+				"priority": 100,
+				"condition": "always",
+				"action": "skill",
+				"skill_id": "howling"
+			}
+		]
 	}
 }

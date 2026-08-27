@@ -12,6 +12,7 @@ var tmp_branch := 0
 var dialog: Array = []
 var dialog_index := 0
 var ignore_opening_input := true
+var reveal_elapsed := 0.0
 
 signal dialog_finished(result)
 
@@ -48,7 +49,7 @@ func _show_current_line():
 
 	name_label.text = line[0]
 	dialog_label.text = line[1]
-	dialog_label.visible_ratio = 0
+	_start_text_reveal()
 
 func _show_call_menu(items):
 	ingame_menu.show()
@@ -68,11 +69,29 @@ func _show_call_menu(items):
 func _show_branch_line(branch_data):
 	name_label.text = branch_data[0]
 	dialog_label.text = branch_data[1]
-	dialog_label.visible_ratio = 0
+	_start_text_reveal()
 
-func _process(_delta):
-	if dialog_label.text.length() > 0 and dialog_label.visible_ratio < 1:
-		dialog_label.visible_ratio += 1.0 / dialog_label.text.length() * (1.0 - duration)
+func _start_text_reveal() -> void:
+	reveal_elapsed = 0.0
+	dialog_label.visible_characters = 0
+
+func _process(delta: float) -> void:
+	var text_length := dialog_label.text.length()
+	if text_length == 0 or dialog_label.visible_characters >= text_length:
+		return
+
+	if duration <= 0.0:
+		dialog_label.visible_characters = text_length
+		return
+
+	reveal_elapsed += delta
+	var characters_to_reveal := int(reveal_elapsed / duration)
+	if characters_to_reveal > 0:
+		dialog_label.visible_characters = mini(
+			dialog_label.visible_characters + characters_to_reveal,
+			text_length
+		)
+		reveal_elapsed -= characters_to_reveal * duration
 
 func _unhandled_input(event: InputEvent) -> void:
 	if ignore_opening_input:
@@ -83,8 +102,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 
 		# 文字送り中なら全文表示
-		if dialog_label.visible_ratio < 1:
-			dialog_label.visible_ratio = 1
+		if dialog_label.visible_characters < dialog_label.text.length():
+			dialog_label.visible_characters = dialog_label.text.length()
+			reveal_elapsed = 0.0
 		else:
 			advance_dialog()
 

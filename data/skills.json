@@ -4,7 +4,7 @@
 		"name": "強打",
 		"sp_cost": 1,
 		"target": "enemy",
-		"power": 3.0
+		"power": 2.0
 	},
 	"vibrato": {
 		"id": "vibrato",
@@ -19,7 +19,7 @@
 		"name": "貫通攻撃",
 		"sp_cost": 1,
 		"target": "enemy",
-		"power": 1.5,
+		"power": 2.0,
 		"ignore_defense": true
 	},
 	"dark_cleave": {
@@ -58,6 +58,74 @@
 		"reduction_rate": 0.5,
 		"attack_rate": 1.5,
 		"turns": 3
+	},
+	"counter": {
+		"id": "counter",
+		"name": "カウンター",
+		"sp_cost": 1,
+		"target": "self",
+		"effect_type": "counter",
+		"turns": 1,
+		"priority": 2
+	},
+	"howling": {
+		"id": "howling",
+		"name": "ハウリング",
+		"sp_cost": 0,
+		"target": "self",
+		"effect_type": "howling",
+		"priority": 1
+	},
+	"electrogenesis": {
+		"id": "electrogenesis",
+		"name": "起電",
+		"sp_cost": 0,
+		"target": "enemy",
+		"power": 1.0,
+		"element": "electric"
+	},
+	"inspect": {
+		"id": "inspect",
+		"name": "看破",
+		"sp_cost": 0,
+		"target": "enemy",
+		"effect_type": "inspect"
+	},
+	"shout": {
+		"id": "shout",
+		"name": "シャウト",
+		"sp_cost": 1,
+		"target": "enemy",
+		"power": 1.5,
+		"ignore_defense": true
+	},
+	"high_voltage": {
+		"id": "high_voltage",
+		"name": "ハイボルテージ",
+		"sp_cost": 0,
+		"target": "party",
+		"effect_type": "party_aura",
+		"aura_id": "high_voltage",
+		"damage_bonus": 10,
+		"incoming_damage_bonus": 5
+	},
+	"chill_down": {
+		"id": "chill_down",
+		"name": "チルダウン",
+		"sp_cost": 0,
+		"target": "party",
+		"effect_type": "party_aura",
+		"aura_id": "chill_down",
+		"speed_modifier": -5,
+		"defense_rate": 1.2
+	},
+	"off_vocal": {
+		"id": "off_vocal",
+		"name": "オフボーカル",
+		"sp_cost": 0,
+		"target": "party",
+		"effect_type": "party_aura",
+		"aura_id": ""
 	},
 	"acid": {
 		"id": "acid",

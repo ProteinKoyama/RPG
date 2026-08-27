@@ -29,8 +29,22 @@ func setup(character,index):
 	hp_text.text = "HP " + str(character.hp) + "/" + str(character.max_hp)
 	sp_text.text = "SP " + str(character.sp) + "/" + str(character.max_sp)
 	effect_text.text = _get_effect_text(character)
-	face_graphic.visible = character.char_id == "girl"
+	_update_face_graphic(character)
 	attack_button.focus_mode = Control.FOCUS_ALL
+
+func _update_face_graphic(character):
+	face_graphic.visible = false
+	face_graphic.texture = null
+	if character == null:
+		return
+	var face_path = character.battle_face_path
+	if face_path == "":
+		return
+	if !ResourceLoader.exists(face_path):
+		push_warning("Battle face image not found: " + face_path)
+		return
+	face_graphic.texture = load(face_path)
+	face_graphic.visible = true
 
 func _get_effect_text(character) -> String:
 	if character == null or !character.has_method("get_active_effect_labels"):

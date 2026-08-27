@@ -17,6 +17,8 @@ var pending_item_id := ""
 var last_top_button: Button = null
 var equipment_description_label: Label = null
 var equipment_preview_list: VBoxContainer = null
+var menu_skill_buttons: Array = []
+var menu_skill_scroll: ScrollContainer = null
 
 func _ready():
 	hide()
@@ -64,6 +66,10 @@ func _input(event):
 		return
 	if event.is_action_pressed("ui_cancel") and current_screen == "options":
 		await _return_to_top_menu()
+		get_viewport().set_input_as_handled()
+		return
+
+	if showing_member_detail and detail_view == "skills" and _handle_skill_list_navigation(event):
 		get_viewport().set_input_as_handled()
 		return
 
@@ -203,7 +209,12 @@ func _set_detail_view(view_name):
 
 func _add_all_members_view():
 	for member in current_party:
-		var row = VBoxContainer.new()
+		var row = HBoxContainer.new()
+		row.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		row.add_theme_constant_override("separation", 12)
+
+		var stats = VBoxContainer.new()
+		stats.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 
 		var name = Label.new()
 		name.text = member.char_name
@@ -217,17 +228,24 @@ func _add_all_members_view():
 		var sp = Label.new()
 		sp.text = "SP: %d / %d" % [member.sp, member.max_sp]
 
-		row.add_child(name)
-		row.add_child(level)
-		row.add_child(hp)
-		row.add_child(sp)
+		stats.add_child(name)
+		stats.add_child(level)
+		stats.add_child(hp)
+		stats.add_child(sp)
+		row.add_child(_create_menu_face_rect(member))
+		row.add_child(stats)
 
 		var frame = _create_padded_panel()
 		frame.add_child(row)
 		detail_panel.add_child(frame)
 
 func _add_status_view(member):
-	var row = VBoxContainer.new()
+	var row = HBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	row.add_theme_constant_override("separation", 12)
+
+	var stats = VBoxContainer.new()
+	stats.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 
 	var hp = Label.new()
 	hp.text = "HP: %d / %d" % [member.hp, member.max_hp]
@@ -247,40 +265,192 @@ func _add_status_view(member):
 	var speed = Label.new()
 	speed.text = "素早さ: %d" % member.speed
 
-	row.add_child(level)
-	row.add_child(hp)
-	row.add_child(sp)
-	row.add_child(atk)
-	row.add_child(defense)
-	row.add_child(speed)
+	stats.add_child(level)
+	stats.add_child(hp)
+	stats.add_child(sp)
+	stats.add_child(atk)
+	stats.add_child(defense)
+	stats.add_child(speed)
+	row.add_child(_create_menu_face_rect(member))
+	row.add_child(stats)
 
 	var frame = _create_padded_panel()
 	frame.add_child(row)
 	detail_panel.add_child(frame)
 
+func _create_menu_face_rect(member) -> TextureRect:
+	var face = TextureRect.new()
+	face.custom_minimum_size = Vector2(150, 150)
+	face.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	face.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	if member != null and member.face_icon_path != "" and ResourceLoader.exists(member.face_icon_path):
+		face.texture = load(member.face_icon_path)
+	return face
+
 func _add_skills_view(member):
 	var list = VBoxContainer.new()
-	var available_skills = member.get_available_skills()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	menu_skill_buttons.clear()
+	menu_skill_scroll = null
+	var available_skills = _sort_menu_skills(member.get_available_skills())
 	if available_skills.is_empty():
 		var none = Label.new()
 		none.text = "特技を覚えていません"
 		list.add_child(none)
 	else:
-		for skill in available_skills:
-			var skill_box = VBoxContainer.new()
-			var name = Label.new()
-			name.text = skill.get("name", "特技")
-			var cost = Label.new()
-			cost.text = SkillDatabase.get_menu_skill_cost_text(skill)
-			var effect = Label.new()
-			effect.text = SkillDatabase.get_menu_skill_description(skill)
-			skill_box.add_child(name)
-			skill_box.add_child(cost)
-			skill_box.add_child(effect)
-			var frame = _create_padded_panel()
-			frame.add_child(skill_box)
-			list.add_child(frame)
+		var scroll = ScrollContainer.new()
+		menu_skill_scroll = scroll
+		scroll.custom_minimum_size = Vector2(0, 360)
+		scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		scroll.set("horizontal_scroll_mode", 0)
+		list.add_child(scroll)
+
+		var rows = VBoxContainer.new()
+		rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		rows.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		rows.add_theme_constant_override("separation", 8)
+		scroll.add_child(rows)
+
+		var row: HBoxContainer = null
+		for i in range(available_skills.size()):
+			if i % 2 == 0:
+				row = HBoxContainer.new()
+				row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				row.add_theme_constant_override("separation", 10)
+				rows.add_child(row)
+			row.add_child(_create_skill_button_frame(available_skills[i], scroll, menu_skill_buttons))
+			if i == available_skills.size() - 1 and i % 2 == 0:
+				var spacer = Control.new()
+				spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				spacer.size_flags_stretch_ratio = 1.0
+				row.add_child(spacer)
+		_connect_skill_button_focus(menu_skill_buttons)
 	detail_panel.add_child(list)
+
+func _create_skill_button_frame(skill: Dictionary, scroll: ScrollContainer, skill_buttons: Array) -> PanelContainer:
+	var skill_box = VBoxContainer.new()
+	skill_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+	var name = Button.new()
+	name.focus_mode = Control.FOCUS_ALL
+	name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name.text = _get_menu_skill_button_text(skill)
+	name.pressed.connect(_select_menu_skill.bind(skill))
+	name.focus_entered.connect(_scroll_skill_button_into_view.bind(scroll, name))
+	skill_buttons.append(name)
+
+	var cost = Label.new()
+	cost.text = SkillDatabase.get_menu_skill_cost_text(skill)
+
+	var effect = Label.new()
+	effect.text = SkillDatabase.get_menu_skill_description(skill)
+	effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+	skill_box.add_child(name)
+	skill_box.add_child(cost)
+	if skill.get("effect_type", "") == "party_aura":
+		var note = Label.new()
+		note.text = "選択すると戦闘開始時の自動発動に設定されます"
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		skill_box.add_child(note)
+	skill_box.add_child(effect)
+
+	var frame = _create_padded_panel()
+	frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	frame.size_flags_stretch_ratio = 1.0
+	frame.add_child(skill_box)
+	return frame
+
+func _connect_skill_button_focus(buttons: Array):
+	for i in range(buttons.size()):
+		var button = buttons[i]
+		if i > 0:
+			button.focus_previous = buttons[i - 1].get_path()
+			if i % 2 == 1:
+				button.focus_neighbor_left = buttons[i - 1].get_path()
+		if i < buttons.size() - 1:
+			button.focus_next = buttons[i + 1].get_path()
+			if i % 2 == 0:
+				button.focus_neighbor_right = buttons[i + 1].get_path()
+		if i >= 2:
+			button.focus_neighbor_top = buttons[i - 2].get_path()
+		if i + 2 < buttons.size():
+			button.focus_neighbor_bottom = buttons[i + 2].get_path()
+
+func _handle_skill_list_navigation(event) -> bool:
+	if menu_skill_buttons.is_empty():
+		return false
+	var focus_owner = get_viewport().gui_get_focus_owner()
+	var current_index = menu_skill_buttons.find(focus_owner)
+	if current_index == -1:
+		return false
+
+	var next_index = current_index
+	if event.is_action_pressed("ui_down"):
+		next_index = current_index + 2
+	elif event.is_action_pressed("ui_up"):
+		next_index = current_index - 2
+	elif event.is_action_pressed("ui_right") and current_index % 2 == 0:
+		next_index = current_index + 1
+	elif event.is_action_pressed("ui_left") and current_index % 2 == 1:
+		next_index = current_index - 1
+	else:
+		return false
+
+	if next_index < 0 or next_index >= menu_skill_buttons.size():
+		return false
+	var next_button = menu_skill_buttons[next_index]
+	if next_button == null:
+		return false
+	next_button.grab_focus()
+	_scroll_skill_button_into_view(menu_skill_scroll, next_button)
+	return true
+
+func _scroll_skill_button_into_view(scroll: ScrollContainer, control: Control):
+	if scroll == null or control == null:
+		return
+	await get_tree().process_frame
+	if scroll.has_method("ensure_control_visible"):
+		scroll.ensure_control_visible(control)
+	var scroll_rect = scroll.get_global_rect()
+	var control_rect = control.get_global_rect()
+	var scrollbar = scroll.get_v_scroll_bar()
+	if scrollbar == null:
+		return
+	if control_rect.position.y < scroll_rect.position.y:
+		scrollbar.value += control_rect.position.y - scroll_rect.position.y
+	elif control_rect.end.y > scroll_rect.end.y:
+		scrollbar.value += control_rect.end.y - scroll_rect.end.y
+
+func _sort_menu_skills(skills: Array) -> Array:
+	var sorted_skills = skills.duplicate(true)
+	sorted_skills.sort_custom(
+		func(a, b):
+			var a_is_aura = a.get("effect_type", "") == "party_aura"
+			var b_is_aura = b.get("effect_type", "") == "party_aura"
+			if a_is_aura != b_is_aura:
+				return a_is_aura
+			return a.get("name", "") < b.get("name", "")
+	)
+	return sorted_skills
+
+func _get_menu_skill_button_text(skill: Dictionary) -> String:
+	var text = skill.get("name", "特技")
+	if skill.get("effect_type", "") == "party_aura":
+		if skill.get("id", "") == PartyManager.active_party_aura_skill_id:
+			text += "（選択中）"
+	return text
+
+func _select_menu_skill(skill: Dictionary):
+	if skill.get("effect_type", "") == "party_aura":
+		PartyManager.set_active_party_aura_skill_id(skill.get("id", ""))
+		await _update_detail_panel(true)
+		return
+	print("menu skill selected:", skill.get("name", "特技"))
 
 func _add_equipment_view(member):
 	var stats = Label.new()

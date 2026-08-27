@@ -20,6 +20,9 @@ var learn_skills: Array
 var ai_rules: Array
 var equipment: Dictionary
 var image_path:String
+var battle_face_path: String
+var face_icon_path: String
+var element_weaknesses: Dictionary
 var is_defending := false
 var damage_reduction_turns := 0
 var damage_reduction_rate := 1.0
@@ -29,6 +32,11 @@ var attack_boost_rate := 1.0
 var attack_boost_just_applied := false
 var battle_turn_count := 0
 var status_effects := {}
+var party_aura_id := ""
+var counter_turns := 0
+var counter_just_applied := false
+var howling_active := false
+var howling_triggered_this_turn := false
 
 const STATUS_MENTAL_WEAKNESS := "mental_weakness"
 const STATUS_EFFECT_NAMES := {
@@ -57,6 +65,9 @@ func _init(data: Dictionary):
 	ai_rules = data.get("ai_rules", []).duplicate(true)
 	equipment = _create_equipment_slots(data.get("equipment", {}))
 	image_path = data.get("image","")
+	battle_face_path = data.get("battle_face", "")
+	face_icon_path = data.get("face_icon", data.get("menu_face", ""))
+	element_weaknesses = data.get("element_weaknesses", {}).duplicate(true)
 	recalculate_stats()
 	hp = max_hp
 	learn_available_skills()
@@ -104,6 +115,13 @@ func has_skill(skill_id: String) -> bool:
 		if skill.get("id", "") == skill_id:
 			return true
 	return false
+
+func learn_skill_by_id(skill_id: String) -> Dictionary:
+	var skill = _resolve_skill(skill_id)
+	if skill.is_empty() or has_skill(skill.get("id", "")):
+		return {}
+	skills.append(skill.duplicate(true))
+	return skill
 
 func get_available_skills() -> Array:
 	var available_skills = skills.duplicate(true)
@@ -156,6 +174,30 @@ func apply_attack_boost(rate: float, turns: int):
 	attack_boost_turns = max(attack_boost_turns, turns)
 	attack_boost_just_applied = true
 
+func start_counter(turns: int):
+	counter_turns = max(counter_turns, turns)
+	counter_just_applied = true
+
+func can_counter() -> bool:
+	return counter_turns > 0
+
+func consume_counter():
+	counter_turns = 0
+	counter_just_applied = false
+
+func start_howling():
+	howling_active = true
+	howling_triggered_this_turn = false
+
+func can_trigger_howling() -> bool:
+	return howling_active and !howling_triggered_this_turn
+
+func mark_howling_triggered():
+	howling_triggered_this_turn = true
+
+func reset_turn_limited_effects():
+	howling_triggered_this_turn = false
+
 func apply_status_effect(effect_id: String, turns := -1):
 	if effect_id == "":
 		return
@@ -177,8 +219,16 @@ func clear_battle_effects():
 	attack_boost_turns = 0
 	attack_boost_rate = 1.0
 	attack_boost_just_applied = false
+	counter_turns = 0
+	counter_just_applied = false
+	howling_active = false
+	howling_triggered_this_turn = false
 	status_effects.clear()
+	party_aura_id = ""
 	battle_turn_count = 0
+
+func set_party_aura(aura_id: String):
+	party_aura_id = aura_id
 
 func get_active_effect_labels() -> Array:
 	var labels := []
@@ -190,12 +240,46 @@ func get_active_effect_labels() -> Array:
 		labels.append("軽減%dT" % damage_reduction_turns)
 	if attack_boost_turns > 0:
 		labels.append("攻撃UP%dT" % attack_boost_turns)
+	if counter_turns > 0:
+		labels.append("カウンター")
+	if howling_active:
+		labels.append("ハウリング")
+	match party_aura_id:
+		"high_voltage":
+			labels.append("ハイボルテージ")
+		"chill_down":
+			labels.append("チルダウン")
 	return labels
 
 func get_current_attack() -> int:
 	if attack_boost_turns > 0:
 		return max(1, int(ceil(attack * attack_boost_rate)))
 	return attack
+
+func get_current_defense() -> int:
+	if party_aura_id == "chill_down":
+		return max(0, int(ceil(defense * 1.2)))
+	return defense
+
+func get_current_speed() -> int:
+	if party_aura_id == "chill_down":
+		return max(0, speed - 5)
+	return speed
+
+func get_damage_bonus() -> int:
+	if party_aura_id == "high_voltage":
+		return 10
+	return 0
+
+func get_incoming_damage_bonus() -> int:
+	if party_aura_id == "high_voltage":
+		return 5
+	return 0
+
+func get_element_rate(element: String) -> float:
+	if element == "":
+		return 1.0
+	return float(element_weaknesses.get(element, 1.0))
 
 func tick_turn_effects():
 	var messages := []
@@ -217,6 +301,10 @@ func tick_turn_effects():
 		attack_boost_turns -= 1
 		if attack_boost_turns <= 0:
 			attack_boost_rate = 1.0
+	if counter_just_applied:
+		counter_just_applied = false
+	elif counter_turns > 0:
+		counter_turns -= 1
 	return messages
 
 func _tick_status_effect_turns():
@@ -307,20 +395,24 @@ func attack_target(target: Character):
 	messages.append(target.char_name + " に " + str(attack) + " ダメージ！（残りHP: " + str(target.hp) + "）")
 	return messages
 
-func take_damage(incoming_attack: int) -> int:
-	var damage = max(1, incoming_attack - defense)
+func take_damage(incoming_attack: int, element := "") -> int:
+	var damage = max(1, incoming_attack - get_current_defense())
+	damage = max(1, int(ceil(damage * get_element_rate(element))))
 	if is_defending:
 		damage = max(1, int(ceil(damage * 0.5)))
 	if damage_reduction_turns > 0:
 		damage = max(1, int(ceil(damage * damage_reduction_rate)))
+	damage += get_incoming_damage_bonus()
 	hp = max(0, hp - damage)
 	return damage
-func take_direct_damage(incoming_attack: int) -> int:
+func take_direct_damage(incoming_attack: int, element := "") -> int:
 	var damage = max(1, incoming_attack)
+	damage = max(1, int(ceil(damage * get_element_rate(element))))
 	if is_defending:
 		damage = max(1, int(ceil(damage * 0.5)))
 	if damage_reduction_turns > 0:
 		damage = max(1, int(ceil(damage * damage_reduction_rate)))
+	damage += get_incoming_damage_bonus()
 	hp = max(0, hp - damage)
 	return damage
 

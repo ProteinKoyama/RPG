@@ -27,7 +27,7 @@
 		"name": "白夜の剣",
 		"type": "equipment",
 		"slot": "weapon",
-		"description": "少女だけが扱える白い剣。",
+		"description": "淡い輝きを放つ剣。あらゆる闇を薙ぎ払う。",
 		"equip_character_ids": [
 			"girl"
 		],

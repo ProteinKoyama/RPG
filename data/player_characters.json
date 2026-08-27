@@ -8,6 +8,8 @@
 		"attack": 30,
 		"defense": 20,
 		"speed": 20,
+		"battle_face": "res://assets/pictures/charcut_girl.png",
+		"face_icon": "res://assets/pictures/icon_girl.png",
 		"equipment": {
 			"weapon": "will",
 			"body": "",
@@ -28,14 +30,17 @@
 		"attack": 10,
 		"defense": 10,
 		"speed": 30,
+		"battle_face": "res://assets/pictures/charcut_moeko.png",
+		"face_icon": "res://assets/pictures/icon_moeko.png",
 		"skills": [
-			"vibrato"
+			"vibrato",
+			"shout",
+			"high_voltage",
+			"chill_down",
+			"off_vocal"
 		],
 		"learn_skills": [
-			{
-				"level": 2,
-				"skill_id": "pierce_attack"
-			}
+
 		]
 	},
 	"sakuraba": {
@@ -47,6 +52,8 @@
 		"attack": 20,
 		"defense": 30,
 		"speed": 10,
+		"battle_face": "res://assets/pictures/charcut_sakuraba.png",
+		"face_icon": "res://assets/pictures/icon_sakuraba.png",
 		"skills": [
 			"crying_plea"
 		],

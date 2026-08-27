@@ -13,6 +13,10 @@ func _ready():
 	refresh_sprite()
 	face_direction("front")
 
+func _exit_tree():
+	if player_in_range:
+		EventManager.unregister_npc_interaction()
+
 func refresh_sprite():
 	if data != null and data.sprite_frames != null:
 		animated_sprite.sprite_frames = data.sprite_frames
@@ -34,20 +38,24 @@ func _unhandled_input(event):
 
 	if event.is_action_pressed("interact"):
 		busy = true
+		EventManager.begin_npc_event()
 		if player_ref != null:
 			face_position(player_ref.global_position)
 		print("pressed interact")
 		if data == null or data.events.is_empty():
 			print("NPC event is empty")
+			EventManager.end_npc_event()
 			busy = false
 			get_viewport().set_input_as_handled()
 			return
 		await EventManager.start_cutscene(data.events)
 		if data != null and data.remove_after_events:
+			EventManager.end_npc_event()
 			queue_free()
 			return
 		refresh_sprite()
 		face_direction("front")
+		EventManager.end_npc_event()
 		busy = false
 		get_viewport().set_input_as_handled()
 
@@ -76,9 +84,11 @@ func _on_body_entered(body):
 	if body.name == "Player":
 		player_in_range = true
 		player_ref = body
+		EventManager.register_npc_interaction()
 
 func _on_body_exited(body):
 	if body.name == "Player":
 		player_in_range = false
 		player_ref = null
 		busy = false
+		EventManager.unregister_npc_interaction()

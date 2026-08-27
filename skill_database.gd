@@ -71,6 +71,7 @@ func get_menu_skill_cost_text(skill: Dictionary) -> String:
 func get_skill_description(skill: Dictionary) -> String:
 	var target = skill.get("target", "enemy")
 	var power = float(skill.get("power", 1.0))
+	var element_text = _get_element_text(skill.get("element", ""))
 	if skill.get("effect_type", "") == "damage_reduction":
 		var turns = int(skill.get("turns", 1))
 		var rate = float(skill.get("reduction_rate", 1.0))
@@ -80,6 +81,12 @@ func get_skill_description(skill: Dictionary) -> String:
 			var attack_percent = int(round((float(skill.get("attack_rate", 1.0)) - 1.0) * 100.0))
 			text += "、攻撃力を%d%%上げる" % attack_percent
 		return text
+	if skill.get("effect_type", "") == "counter":
+		return "攻撃されたとき防御力参照で反撃する"
+	if skill.get("effect_type", "") == "howling":
+		return "ハウリング状態になり、味方がダメージを与えたとき1ターンに1回だけ同じダメージを与える"
+	if skill.get("effect_type", "") == "inspect":
+		return "敵のステータス、残りHP、弱点を確認する"
 	if skill.get("effect_type", "") == "fixed_damage":
 		if target == "all_enemies":
 			if skill.get("ignore_defense", false):
@@ -98,11 +105,27 @@ func get_skill_description(skill: Dictionary) -> String:
 		if turns > 0:
 			return "対象を%dターン%sにする" % [turns, status_name]
 		return "対象を%sにする" % status_name
+	if skill.get("effect_type", "") == "party_aura":
+		match skill.get("aura_id", skill.get("id", "")):
+			"":
+				return "効果なし"
+			"high_voltage":
+				return "戦闘中、味方全体が与えるダメージを+%dし、受けるダメージが+%dされる" % [
+					int(skill.get("damage_bonus", 0)),
+					int(skill.get("incoming_damage_bonus", 0))
+				]
+			"chill_down":
+				var speed_modifier = int(skill.get("speed_modifier", 0))
+				var defense_percent = int(round(float(skill.get("defense_rate", 1.0)) * 100.0))
+				if speed_modifier < 0:
+					return "戦闘中、味方全体の素早さが%d下がり、防御力が%d%%になる" % [abs(speed_modifier), defense_percent]
+				return "戦闘中、味方全体の素早さが%d上がり、防御力が%d%%になる" % [speed_modifier, defense_percent]
+		return "戦闘中、味方全体に効果を与える"
 	if target == "enemy":
 		var power_text = _format_power(power)
 		if skill.get("ignore_defense", false):
-			return "攻撃力の%s倍で防御を無視して攻撃する" % power_text
-		return "攻撃力の%s倍で攻撃する" % power_text
+			return "%s攻撃力の%s倍で防御を無視して攻撃する" % [element_text, power_text]
+		return "%s攻撃力の%s倍で攻撃する" % [element_text, power_text]
 	if target == "self":
 		return "自分に効果を与える"
 	if target == "ally":
@@ -114,6 +137,9 @@ func get_skill_description(skill: Dictionary) -> String:
 func get_battle_skill_description(skill: Dictionary) -> String:
 	var cost = get_skill_cost_text(skill)
 	var effect = get_skill_description(skill)
+	var priority = int(skill.get("priority", 0))
+	if priority > 0:
+		effect = "優先度：%d/%s" % [priority, effect]
 	if cost == "":
 		return effect
 	return "%s/%s" % [cost, effect]
@@ -150,3 +176,9 @@ func _get_status_effect_name(status_id: String) -> String:
 		"mental_weakness":
 			return "精神虚弱"
 	return status_id
+
+func _get_element_text(element: String) -> String:
+	match element:
+		"electric":
+			return "電気属性の"
+	return ""

@@ -1,0 +1,42 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://b1sjmprbk51a5"]
+
+[ext_resource type="Texture2D" uid="uid://cp2c5q2cfxfow" path="res://assets/charachip/Chara_doctor.png" id="1_ggm8r"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8uyec"]
+atlas = ExtResource("1_ggm8r")
+region = Rect2(20, 0, 20, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dp6vi"]
+atlas = ExtResource("1_ggm8r")
+region = Rect2(20, 20, 20, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ggm8r"]
+atlas = ExtResource("1_ggm8r")
+region = Rect2(20, 40, 20, 20)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8uyec")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dp6vi")
+}],
+"loop": 1,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ggm8r")
+}],
+"loop": 1,
+"name": &"right",
+"speed": 5.0
+}]

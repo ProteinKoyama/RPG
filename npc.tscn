@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bgqcj5rgps2tg" path="res://npc.gd" id="1_xxcha"]
 [ext_resource type="Texture2D" uid="uid://c1o76mhjglfq6" path="res://assets/charachip/Chara_doctor_common.png" id="3_kh24r"]
-[ext_resource type="Texture2D" uid="uid://cp2c5q2cfxfow" path="res://assets/charachip/Chara_Romachang.png" id="4_ul7y6"]
+[ext_resource type="Texture2D" uid="uid://cp2c5q2cfxfow" path="res://assets/charachip/Chara_doctor.png" id="4_ul7y6"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_npc"]
 

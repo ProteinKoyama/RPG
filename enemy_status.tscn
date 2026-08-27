@@ -51,7 +51,7 @@ horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="EnemySprite" type="TextureRect" parent="VBoxContainer"]
-custom_minimum_size = Vector2(200, 400)
+custom_minimum_size = Vector2(300, 500)
 layout_mode = 2
 mouse_filter = 2
 expand_mode = 3
@@ -60,9 +60,9 @@ stretch_mode = 5
 [node name="TargetCursor" type="TextureRect" parent="."]
 layout_mode = 0
 offset_left = 606.0
-offset_top = 113.0
-offset_right = 656.0
-offset_bottom = 159.0
+offset_top = 90.0
+offset_right = 631.0
+offset_bottom = 113.0
 texture = ExtResource("2_i2w16")
 expand_mode = 1
 flip_v = true

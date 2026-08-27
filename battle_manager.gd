@@ -51,6 +51,8 @@ func start_battle(enemy_ids: Array, battle_bgm_path := "", can_escape := true):
 	battle_scene.play_battle_bgm(battle_bgm_path)
 
 	party = PartyManager.get_party()
+	var starting_aura_skill_id = PartyManager.get_active_party_aura_skill_id_for_battle()
+	apply_party_battle_aura(starting_aura_skill_id)
 	await battle_scene.update_party_ui(party)
 
 	enemies.clear()
@@ -60,6 +62,10 @@ func start_battle(enemy_ids: Array, battle_bgm_path := "", can_escape := true):
 		enemies.append(enemy)
 
 	await battle_scene.update_enemy_ui(enemies)
+	if starting_aura_skill_id != "":
+		var starting_aura = SkillDatabase.get_skill_data(starting_aura_skill_id)
+		if starting_aura.get("aura_id", starting_aura.get("id", "")) != "":
+			await battle_scene.show_message(starting_aura.get("name", "特技") + "が発動した！")
 	state = BattleState.MAIN_COMMAND
 	await battle_scene.show_main_commands()
 
@@ -129,35 +135,55 @@ func advance_after_action_selected():
 
 func execute_turn():
 	battle_scene.disable_all_commands()
+	reset_turn_limited_effects()
 	var turn_order = []
 
 	for member in party:
 		if member.is_alive():
-			turn_order.append(member)
+			var command_data = get_action_for_character(member)
+			if command_data != null:
+				turn_order.append({
+					"character": member,
+					"command": command_data,
+					"priority_group": get_action_priority_group(command_data),
+					"priority": get_action_priority(command_data)
+				})
 	for enemy in enemies:
 		if enemy.is_alive():
-			turn_order.append(enemy)
+			enemy.battle_turn_count += 1
+			var enemy_action = choose_enemy_action(enemy)
+			turn_order.append({
+				"character": enemy,
+				"command": enemy_action,
+				"priority_group": get_action_priority_group(enemy_action),
+				"priority": get_action_priority(enemy_action)
+			})
 
 	turn_order.sort_custom(
 		func(a, b):
-			return a.speed > b.speed
+			var group_a = int(a.get("priority_group", 0))
+			var group_b = int(b.get("priority_group", 0))
+			if group_a != group_b:
+				return group_a > group_b
+			var priority_a = int(a.get("priority", 0))
+			var priority_b = int(b.get("priority", 0))
+			if priority_a != priority_b:
+				return priority_a > priority_b
+			return a.get("character").get_current_speed() > b.get("character").get_current_speed()
 	)
 
-	for character in turn_order:
+	for turn_data in turn_order:
+		var character = turn_data.get("character")
+		var command_data = turn_data.get("command", {})
 		if !character.is_alive():
 			continue
 		if await check_battle_end():
 			return
 
 		if party.has(character):
-			var command_data = get_action_for_character(character)
-			if command_data == null:
-				continue
 			await execute_character_action(character, command_data, get_first_alive_enemy())
 		elif enemies.has(character):
-			character.battle_turn_count += 1
-			var enemy_action = choose_enemy_action(character)
-			await execute_character_action(character, enemy_action, get_first_alive_party_member())
+			await execute_character_action(character, command_data, get_first_alive_party_member())
 
 		await battle_scene.update_party_ui(party)
 		battle_scene.refresh_enemy_status_ui()
@@ -177,6 +203,20 @@ func execute_turn():
 	state = BattleState.MAIN_COMMAND
 	await battle_scene.show_main_commands()
 
+func get_action_priority_group(command_data: Dictionary) -> int:
+	if command_data.get("action", "") != "skill":
+		return 0
+	var skill = command_data.get("skill", {})
+	if skill.get("effect_type", "") == "party_aura":
+		return 1
+	return 0
+
+func get_action_priority(command_data: Dictionary) -> int:
+	if command_data.get("action", "") != "skill":
+		return 0
+	var skill = command_data.get("skill", {})
+	return int(skill.get("priority", 0))
+
 func execute_character_action(character, command_data: Dictionary, fallback_target):
 	match command_data.get("action", "attack"):
 		"attack":
@@ -193,7 +233,7 @@ func execute_character_action(character, command_data: Dictionary, fallback_targ
 			if skill_target == "self":
 				target = character
 			elif skill_target == "all_enemies":
-				target = enemies
+				target = get_opposing_group(character)
 			elif skill_target == "enemy" and (target == null or !target.is_alive()):
 				target = fallback_target
 			if skill.is_empty() or target == null:
@@ -203,8 +243,9 @@ func execute_character_action(character, command_data: Dictionary, fallback_targ
 			character.start_defense()
 			await battle_scene.show_message(character.char_name + "は防御している！")
 		"charge":
+			var before_sp = character.sp
 			character.charge_sp()
-			await battle_scene.show_message(character.char_name + "はSPをためた！")
+			await battle_scene.show_message(character.char_name + " チャージ" + str(before_sp) + "→" + str(character.sp))
 		"item":
 			var item_id = command_data.get("item_id", "")
 			var target = command_data.get("target", character)
@@ -212,9 +253,11 @@ func execute_character_action(character, command_data: Dictionary, fallback_targ
 
 func execute_attack_action(character, target):
 	await battle_scene.show_message(character.char_name + "の攻撃！")
-	var damage = target.take_damage(character.get_current_attack())
+	var damage = target.take_damage(character.get_current_attack() + character.get_damage_bonus())
 	print(target.char_name, "damage:", damage, "HP:", target.hp, "/", target.max_hp)
 	await battle_scene.show_message(target.char_name + "に" + str(damage) + "ダメージ！")
+	await execute_howling_follow_up(character, target, damage)
+	await execute_counter_if_needed(target, character)
 
 func execute_skill_action(character, skill: Dictionary, target):
 	if !character.can_use_skill(skill):
@@ -223,6 +266,15 @@ func execute_skill_action(character, skill: Dictionary, target):
 
 	character.consume_sp(skill.get("sp_cost", 0))
 	character.consume_hp(skill.get("hp_cost", 0))
+	if skill.get("effect_type", "") == "party_aura":
+		var aura_id = skill.get("aura_id", skill.get("id", ""))
+		PartyManager.set_active_party_aura_skill_id(skill.get("id", aura_id))
+		apply_party_battle_aura(aura_id)
+		await battle_scene.show_message(character.char_name + "は" + skill.get("name", "特技") + "を使った！")
+		await battle_scene.show_message("パーティの状態が" + skill.get("name", "特技") + "に切り替わった！")
+		await battle_scene.update_party_ui(party)
+		return
+
 	if skill.get("effect_type", "") == "damage_reduction":
 		var rate = float(skill.get("reduction_rate", 1.0))
 		var turns = int(skill.get("turns", 1))
@@ -233,19 +285,43 @@ func execute_skill_action(character, skill: Dictionary, target):
 		await battle_scene.show_message(target.char_name + "は力を固めた！")
 		return
 
+	if skill.get("effect_type", "") == "counter":
+		var turns = int(skill.get("turns", 1))
+		character.start_counter(turns)
+		await battle_scene.show_message(character.char_name + "は" + skill.get("name", "特技") + "を使った！")
+		await battle_scene.show_message(character.char_name + "は反撃の構えを取った！")
+		return
+
+	if skill.get("effect_type", "") == "howling":
+		character.start_howling()
+		await battle_scene.show_message(character.char_name + "は" + skill.get("name", "特技") + "を使った！")
+		await battle_scene.show_message(character.char_name + "はハウリング状態になった！")
+		await battle_scene.update_party_ui(party)
+		return
+
+	if skill.get("effect_type", "") == "inspect":
+		await battle_scene.show_message(character.char_name + "は" + skill.get("name", "特技") + "を使った！")
+		await show_inspect_message(target)
+		return
+
 	if skill.get("effect_type", "") == "fixed_damage":
-		var fixed_damage = int(skill.get("fixed_damage", 0))
+		var fixed_damage = int(skill.get("fixed_damage", 0)) + character.get_damage_bonus()
+		var fixed_element = skill.get("element", "")
 		if typeof(target) == TYPE_ARRAY:
 			await battle_scene.show_message(character.char_name + "は" + skill.get("name", "特技") + "を使った！")
 			for target_member in target:
 				if target_member == null or !target_member.is_alive():
 					continue
-				var area_damage = target_member.take_direct_damage(fixed_damage)
+				var area_damage = target_member.take_direct_damage(fixed_damage, fixed_element)
 				await battle_scene.show_message(target_member.char_name + "に" + str(area_damage) + "ダメージ！")
+				await execute_howling_follow_up(character, target_member, area_damage)
+				await execute_counter_if_needed(target_member, character)
 			return
-		var damage = target.take_direct_damage(fixed_damage)
+		var damage = target.take_direct_damage(fixed_damage, fixed_element)
 		await battle_scene.show_message(character.char_name + "は" + skill.get("name", "特技") + "を使った！")
 		await battle_scene.show_message(target.char_name + "に" + str(damage) + "ダメージ！")
+		await execute_howling_follow_up(character, target, damage)
+		await execute_counter_if_needed(target, character)
 		return
 
 	if skill.get("effect_type", "") == "heal_hp":
@@ -275,15 +351,66 @@ func execute_skill_action(character, skill: Dictionary, target):
 		return
 
 	var power = skill.get("power", 1.0)
-	var skill_attack = int(character.get_current_attack() * power)
+	var skill_attack = int(character.get_current_attack() * power) + character.get_damage_bonus()
+	var element = skill.get("element", "")
 	var damage = 0
 	if skill.get("ignore_defense", false):
-		damage = target.take_direct_damage(skill_attack)
+		damage = target.take_direct_damage(skill_attack, element)
 	else:
-		damage = target.take_damage(skill_attack)
+		damage = target.take_damage(skill_attack, element)
 
 	await battle_scene.show_message(character.char_name + "は" + skill.get("name", "特技") + "を使った！")
 	await battle_scene.show_message(target.char_name + "に" + str(damage) + "ダメージ！")
+	await execute_howling_follow_up(character, target, damage)
+	await execute_counter_if_needed(target, character)
+
+func reset_turn_limited_effects():
+	for member in party:
+		if member != null and member.has_method("reset_turn_limited_effects"):
+			member.reset_turn_limited_effects()
+	for enemy in enemies:
+		if enemy != null and enemy.has_method("reset_turn_limited_effects"):
+			enemy.reset_turn_limited_effects()
+
+func execute_howling_follow_up(attacker, target, original_damage: int):
+	if attacker == null or target == null:
+		return
+	if original_damage <= 0 or !target.is_alive():
+		return
+	var allies = get_allies_for_character(attacker)
+	if allies.is_empty():
+		return
+	for ally in allies:
+		if ally == null or ally == attacker:
+			continue
+		if !ally.is_alive():
+			continue
+		if !ally.has_method("can_trigger_howling") or !ally.can_trigger_howling():
+			continue
+		ally.mark_howling_triggered()
+		await battle_scene.show_message(ally.char_name + "のハウリング！")
+		var damage = target.take_direct_damage(original_damage)
+		await battle_scene.show_message(target.char_name + "に" + str(damage) + "ダメージ！")
+		await execute_counter_if_needed(target, ally)
+
+func get_allies_for_character(character) -> Array:
+	if party.has(character):
+		return party
+	if enemies.has(character):
+		return enemies
+	return []
+
+func execute_counter_if_needed(defender, attacker):
+	if defender == null or attacker == null:
+		return
+	if !defender.is_alive() or !attacker.is_alive():
+		return
+	if !defender.has_method("can_counter") or !defender.can_counter():
+		return
+	defender.consume_counter()
+	await battle_scene.show_message(defender.char_name + "のカウンター！")
+	var counter_damage = attacker.take_damage(defender.get_current_defense() + defender.get_damage_bonus())
+	await battle_scene.show_message(attacker.char_name + "に" + str(counter_damage) + "ダメージ！")
 
 func execute_item_action(character, item_id: String, target):
 	if item_id == "":
@@ -296,6 +423,55 @@ func execute_item_action(character, item_id: String, target):
 		await battle_scene.show_message(character.char_name + "は" + item_name + "を使った！")
 	else:
 		await battle_scene.show_message(item_name + "は使えない！")
+
+func show_inspect_message(target):
+	if target == null:
+		return
+	await battle_scene.show_message(
+		"%s HP %d/%d SP %d/%d" % [
+			target.char_name,
+			target.hp,
+			target.max_hp,
+			target.sp,
+			target.max_sp
+		]
+	)
+	await battle_scene.show_message(
+		"攻撃 %d 防御 %d 素早さ %d" % [
+			target.attack,
+			target.defense,
+			target.speed
+		]
+	)
+	var weakness_text = _get_element_weakness_text(target)
+	if weakness_text != "":
+		await battle_scene.show_message("弱点: " + weakness_text)
+	else:
+		await battle_scene.show_message("弱点: なし")
+
+func _get_element_weakness_text(target) -> String:
+	if target == null or !("element_weaknesses" in target):
+		return ""
+	var names := []
+	for element in target.element_weaknesses.keys():
+		var rate = float(target.element_weaknesses[element])
+		if rate > 1.0:
+			names.append(_get_element_name(element) + " x" + str(rate))
+	return _join_strings(names, " / ")
+
+func _get_element_name(element: String) -> String:
+	match element:
+		"electric":
+			return "電気"
+	return element
+
+func _join_strings(values: Array, separator: String) -> String:
+	var text := ""
+	for i in range(values.size()):
+		if i > 0:
+			text += separator
+		text += str(values[i])
+	return text
 
 func choose_enemy_action(enemy):
 	var rules = enemy.ai_rules.duplicate()
@@ -431,11 +607,23 @@ func get_first_alive_enemy():
 			return enemy
 	return null
 
+func get_opposing_group(character) -> Array:
+	if party.has(character):
+		return enemies
+	if enemies.has(character):
+		return party
+	return []
+
 func get_first_alive_party_member():
 	for member in party:
 		if member.is_alive():
 			return member
 	return null
+
+func apply_party_battle_aura(aura_id: String):
+	for member in party:
+		if member != null and member.has_method("set_party_aura"):
+			member.set_party_aura(aura_id)
 
 func end_battle(result: String):
 	print(result)
@@ -584,6 +772,16 @@ func _on_skill_selected(skill):
 			"action": "skill",
 			"skill": pending_skill,
 			"target": party[pending_member_index]
+		})
+		current_member_index = pending_member_index
+		await advance_after_action_selected()
+		return
+	if skill.get("target", "enemy") == "party":
+		selected_actions.append({
+			"user": party[pending_member_index],
+			"action": "skill",
+			"skill": pending_skill,
+			"target": party
 		})
 		current_member_index = pending_member_index
 		await advance_after_action_selected()

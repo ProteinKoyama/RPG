@@ -36,6 +36,8 @@ func _ready():
 	death_mat.set_shader_parameter("reveal", 1.0)
 
 	target_cursor.visible = false
+	await get_tree().process_frame
+	_update_target_cursor_position()
 
 func setup(enemy):
 	enemy_ref = enemy
@@ -49,6 +51,8 @@ func setup(enemy):
 	modulate = Color.WHITE
 	scale = Vector2.ONE
 	is_dying = false
+	await get_tree().process_frame
+	_update_target_cursor_position()
 
 func refresh_effects():
 	effect_label.text = _get_effect_text(enemy_ref)
@@ -75,6 +79,7 @@ func _unhandled_input(event):
 func enable_target_select():
 	target_select_enabled = true
 	focus_mode = Control.FOCUS_ALL
+	_update_target_cursor_position()
 	grab_focus()
 
 func disable_target_select():
@@ -102,9 +107,22 @@ func _set_reveal(v: float) -> void:
 	if death_mat:
 		death_mat.set_shader_parameter("reveal", v)
 
+func _update_target_cursor_position():
+	if enemy_sprite == null or target_cursor == null:
+		return
+	var sprite_global_rect = enemy_sprite.get_global_rect()
+	var sprite_top_center_global = sprite_global_rect.position + Vector2(sprite_global_rect.size.x / 2.0, 0.0)
+	var sprite_top_center = get_global_transform_with_canvas().affine_inverse() * sprite_top_center_global
+	var cursor_size = target_cursor.size
+	target_cursor.position = sprite_top_center - Vector2(cursor_size.x / 2.0, cursor_size.y + 8.0)
+
 func _on_focus_entered():
 	if target_select_enabled and !is_dying:
+		_update_target_cursor_position()
 		target_cursor.visible = true
+		modulate = Color(1.25, 1.25, 1.25, 1.0)
 
 func _on_focus_exited():
 	target_cursor.visible = false
+	if !is_dying:
+		modulate = Color.WHITE
