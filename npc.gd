@@ -42,13 +42,14 @@ func _unhandled_input(event):
 		if player_ref != null:
 			face_position(player_ref.global_position)
 		print("pressed interact")
-		if data == null or data.events.is_empty():
+		var event_source = data.get_event_source() if data != null else null
+		if data == null or _is_event_source_empty(event_source):
 			print("NPC event is empty")
 			EventManager.end_npc_event()
 			busy = false
 			get_viewport().set_input_as_handled()
 			return
-		await EventManager.start_cutscene(data.events)
+		await EventManager.start_cutscene(event_source)
 		if data != null and data.remove_after_events:
 			EventManager.end_npc_event()
 			queue_free()
@@ -58,6 +59,13 @@ func _unhandled_input(event):
 		EventManager.end_npc_event()
 		busy = false
 		get_viewport().set_input_as_handled()
+
+func _is_event_source_empty(event_source) -> bool:
+	if event_source is String or event_source is StringName:
+		return String(event_source).is_empty()
+	if event_source is EventSequence:
+		return event_source.is_empty()
+	return event_source == null or event_source.is_empty()
 
 func face_position(target_position: Vector2):
 	var delta = target_position - global_position

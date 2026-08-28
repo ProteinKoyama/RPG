@@ -76,7 +76,7 @@ func _start_text_reveal() -> void:
 	dialog_label.visible_characters = 0
 
 func _process(delta: float) -> void:
-	var text_length := dialog_label.text.length()
+	var text_length: int = dialog_label.text.length()
 	if text_length == 0 or dialog_label.visible_characters >= text_length:
 		return
 
@@ -85,7 +85,7 @@ func _process(delta: float) -> void:
 		return
 
 	reveal_elapsed += delta
-	var characters_to_reveal := int(reveal_elapsed / duration)
+	var characters_to_reveal: int = int(reveal_elapsed / duration)
 	if characters_to_reveal > 0:
 		dialog_label.visible_characters = mini(
 			dialog_label.visible_characters + characters_to_reveal,

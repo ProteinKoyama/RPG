@@ -12,5 +12,5 @@ metadata/_custom_type_script = "uid://dguwd8iuyakui"
 [resource]
 script = ExtResource("2_gf6ni")
 npc_name = "roma"
-events = Array[ExtResource("1_y7vmv")]([SubResource("Resource_gf6ni")])
+event_id = "npc_roma_battle"
 metadata/_custom_type_script = "uid://dl7ossnnwucgq"

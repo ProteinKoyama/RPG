@@ -5,7 +5,13 @@ class_name GenericEventArea
 @export_enum("enter", "interact")
 var trigger_mode := "interact"
 
+@export_group("JSON Event")
+@export var event_id := ""
+@export_group("Resource Event (Compatibility)")
+@export var event_sequence: EventSequence
+@export_group("Legacy Event Data")
 @export var events: Array[NPCEventData] = []
+@export_group("")
 @export var one_shot := false
 @export var active := true
 @export var disable_if_flag_key := ""
@@ -84,7 +90,8 @@ func _run_events():
 		return
 
 	busy = true
-	if events.is_empty():
+	var event_source = _get_event_source()
+	if _is_event_source_empty(event_source):
 		print("generic event area events are empty")
 		busy = false
 		return
@@ -94,11 +101,25 @@ func _run_events():
 		busy = false
 		return
 	_play_trigger_animation()
-	await event_manager.start_cutscene(events)
+	await event_manager.start_cutscene(event_source)
 	triggered = true
 	if one_shot:
 		active = false
 	busy = false
+
+func _get_event_source():
+	if event_id != "":
+		return event_id
+	if event_sequence != null:
+		return event_sequence
+	return events
+
+func _is_event_source_empty(event_source) -> bool:
+	if event_source is String or event_source is StringName:
+		return String(event_source).is_empty()
+	if event_source is EventSequence:
+		return event_source.is_empty()
+	return event_source == null or event_source.is_empty()
 
 func _get_autoload(node_name: String):
 	var tree = Engine.get_main_loop()

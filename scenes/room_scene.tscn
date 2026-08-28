@@ -6201,7 +6201,7 @@ metadata/_custom_type_script = "uid://dguwd8iuyakui"
 
 [sub_resource type="Resource" id="Resource_rnso5"]
 script = ExtResource("6_no7j0")
-events = Array[ExtResource("5_w1efa")]([SubResource("Resource_lomdf")])
+event_id = "room_moeko_battle"
 metadata/_custom_type_script = "uid://dl7ossnnwucgq"
 
 [sub_resource type="Resource" id="Resource_faceq"]
@@ -6226,7 +6226,7 @@ animations = [{
 script = ExtResource("6_no7j0")
 portrait = ExtResource("8_2joa2")
 sprite_frames = SubResource("SpriteFrames_ir6st")
-events = Array[ExtResource("5_w1efa")]([SubResource("Resource_faceq")])
+event_id = "room_join_sakuraba"
 metadata/_custom_type_script = "uid://dl7ossnnwucgq"
 
 [sub_resource type="Resource" id="Resource_kiu8u"]
@@ -6272,9 +6272,9 @@ position = Vector2(523, 586)
 [node name="UI" type="CanvasLayer" parent="." unique_id=1209239265]
 
 [node name="RoomIntroEvent" parent="." unique_id=5066765 instance=ExtResource("11_ir6st")]
-position = Vector2(598, 342)
+position = Vector2(453, 236)
 trigger_mode = "enter"
-events = Array[ExtResource("5_w1efa")]([SubResource("Resource_room_intro_talk"), SubResource("Resource_room_intro_flag")])
+event_id = "room_intro"
 one_shot = true
 disable_if_flag_key = "room_intro_done"
 event_size = Vector2(220, 180)
@@ -6292,13 +6292,13 @@ position = Vector2(592, 197)
 data = SubResource("Resource_qfq5l")
 
 [node name="GenericEventArea" parent="." unique_id=1227074923 instance=ExtResource("11_ir6st")]
-position = Vector2(645, 547)
+position = Vector2(654, 560)
 scale = Vector2(0.5, 1)
 trigger_mode = "enter"
-events = Array[ExtResource("5_w1efa")]([SubResource("Resource_kiu8u")])
+event_id = "room_to_debug"
 
 [node name="GenericEventArea2" parent="." unique_id=882306583 instance=ExtResource("11_ir6st")]
 position = Vector2(517, 649)
 scale = Vector2(2, 0.5)
 trigger_mode = "enter"
-events = Array[ExtResource("5_w1efa")]([SubResource("Resource_wxayw")])
+event_id = "room_to_previous"

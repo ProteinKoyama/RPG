@@ -1,54 +1,7 @@
-[gd_scene load_steps=14 format=4]
+[gd_scene load_steps=5 format=4]
 
 [ext_resource type="Script" path="res://map_base.gd" id="1_map_base"]
 [ext_resource type="PackedScene" path="res://GenericEventArea.tscn" id="2_generic_event_area"]
-[ext_resource type="Script" path="res://npc_event_data.gd" id="3_npc_event_data"]
-[ext_resource type="Script" path="res://npc_dialog_line_data.gd" id="4_dialog_line"]
-
-[sub_resource type="Resource" id="Resource_talk_line"]
-script = ExtResource("4_dialog_line")
-speaker_name = "デバッグ"
-message = "これはインタラクトで表示する会話イベントです。"
-metadata/_custom_type_script = "uid://cgy21nut6sigv"
-
-[sub_resource type="Resource" id="Resource_enter_line"]
-script = ExtResource("4_dialog_line")
-speaker_name = "デバッグ"
-message = "これは範囲に入った瞬間に発生するイベントです。"
-metadata/_custom_type_script = "uid://cgy21nut6sigv"
-
-[sub_resource type="Resource" id="Resource_talk_event"]
-script = ExtResource("3_npc_event_data")
-event_type = "direct_talk"
-direct_dialog_lines = Array[Resource]([SubResource("Resource_talk_line")])
-metadata/_custom_type_script = "uid://dguwd8iuyakui"
-
-[sub_resource type="Resource" id="Resource_enter_event"]
-script = ExtResource("3_npc_event_data")
-event_type = "direct_talk"
-direct_dialog_lines = Array[Resource]([SubResource("Resource_enter_line")])
-metadata/_custom_type_script = "uid://dguwd8iuyakui"
-
-[sub_resource type="Resource" id="Resource_item_event"]
-script = ExtResource("3_npc_event_data")
-event_type = "item"
-item_id = "potion"
-item_amount = 1
-show_item_dialog = true
-metadata/_custom_type_script = "uid://dguwd8iuyakui"
-
-[sub_resource type="Resource" id="Resource_battle_event"]
-script = ExtResource("3_npc_event_data")
-event_type = "battle"
-battle_enemy_ids = Array[String](["slime"])
-metadata/_custom_type_script = "uid://dguwd8iuyakui"
-
-[sub_resource type="Resource" id="Resource_map_event"]
-script = ExtResource("3_npc_event_data")
-event_type = "map"
-map_scene_path = "res://scenes/room_scene.tscn"
-map_spawn_point = "PlayerSpawnPoint"
-metadata/_custom_type_script = "uid://dguwd8iuyakui"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_horizontal"]
 size = Vector2(768, 32)
@@ -85,7 +38,7 @@ position = Vector2(128, 64)
 [node name="TalkEvent" parent="EventAreas" instance=ExtResource("2_generic_event_area")]
 position = Vector2(160, 160)
 trigger_mode = "interact"
-events = Array[ExtResource("3_npc_event_data")]([SubResource("Resource_talk_event")])
+event_id = "debug_talk"
 event_size = Vector2(96, 96)
 
 [node name="Visual" type="Polygon2D" parent="EventAreas/TalkEvent"]
@@ -102,7 +55,7 @@ text = "Talk"
 [node name="ItemEvent" parent="EventAreas" instance=ExtResource("2_generic_event_area")]
 position = Vector2(320, 160)
 trigger_mode = "interact"
-events = Array[ExtResource("3_npc_event_data")]([SubResource("Resource_item_event")])
+event_id = "debug_give_item"
 one_shot = true
 event_size = Vector2(96, 96)
 
@@ -120,7 +73,7 @@ text = "Item"
 [node name="BattleEvent" parent="EventAreas" instance=ExtResource("2_generic_event_area")]
 position = Vector2(480, 160)
 trigger_mode = "interact"
-events = Array[ExtResource("3_npc_event_data")]([SubResource("Resource_battle_event")])
+event_id = "debug_battle"
 event_size = Vector2(96, 96)
 
 [node name="Visual" type="Polygon2D" parent="EventAreas/BattleEvent"]
@@ -137,7 +90,7 @@ text = "Battle"
 [node name="EnterEvent" parent="EventAreas" instance=ExtResource("2_generic_event_area")]
 position = Vector2(160, 320)
 trigger_mode = "enter"
-events = Array[ExtResource("3_npc_event_data")]([SubResource("Resource_enter_event")])
+event_id = "debug_enter"
 event_size = Vector2(96, 96)
 
 [node name="Visual" type="Polygon2D" parent="EventAreas/EnterEvent"]
@@ -154,7 +107,7 @@ text = "Enter"
 [node name="MapEvent" parent="EventAreas" instance=ExtResource("2_generic_event_area")]
 position = Vector2(480, 320)
 trigger_mode = "interact"
-events = Array[ExtResource("3_npc_event_data")]([SubResource("Resource_map_event")])
+event_id = "debug_change_map"
 event_size = Vector2(96, 96)
 
 [node name="Visual" type="Polygon2D" parent="EventAreas/MapEvent"]

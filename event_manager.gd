@@ -1,16 +1,49 @@
 extends Node
 
+const EVENT_DATABASE_PATH := "res://data/events.json"
+
 signal request_show_dialog(dialog_id)
 signal battle_requested(enemy_ids, battle_bgm_path, escape_enabled)
-signal cutscene_requested(event_keys)
+signal cutscene_requested(event_source)
 var opening_done := false
 var dialog_visible := false
 var flags := {}
 var npc_event_active := false
 var npc_interaction_count := 0
+var json_events: Dictionary = {}
 
 func _ready():
+	load_json_event_database()
 	BattleManager.battle_finished.connect(_on_battle_finished)
+
+func load_json_event_database() -> void:
+	json_events.clear()
+	var file := FileAccess.open(EVENT_DATABASE_PATH, FileAccess.READ)
+	if file == null:
+		push_error("events.json open failed: " + EVENT_DATABASE_PATH)
+		return
+	var parsed = JSON.parse_string(file.get_as_text())
+	if !(parsed is Dictionary):
+		push_error("events.json root must be an object")
+		return
+	json_events = parsed
+
+func get_json_event_sequence(event_id: String) -> Array:
+	if event_id == "":
+		return []
+	if !json_events.has(event_id):
+		push_error("JSON event not found: " + event_id)
+		return []
+	var entry = json_events[event_id]
+	if entry is Array:
+		return entry.duplicate(true)
+	if entry is Dictionary and entry.get("events", null) is Array:
+		return entry["events"].duplicate(true)
+	push_error("JSON event must contain an events array: " + event_id)
+	return []
+
+func has_json_event(event_id: String) -> bool:
+	return json_events.has(event_id)
 
 func show_dialog_by_id(dialog_id):
 	if dialog_visible:
@@ -35,10 +68,10 @@ func start_battle(enemy_ids, battle_bgm_path := "", escape_enabled := true):
 func _on_battle_finished(result):
 	PlayerManager.can_move = true
 	
-func start_cutscene(event_keys) -> void:
+func start_cutscene(event_source) -> void:
 	PlayerManager.can_move = false
 	var cutscene_manager = _get_cutscene_manager()
-	cutscene_requested.emit(event_keys)
+	cutscene_requested.emit(event_source)
 	print("cutscene requested")
 	if cutscene_manager != null:
 		await cutscene_manager.cutscene_finished

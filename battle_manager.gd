@@ -27,6 +27,7 @@ var pending_member_index = 0
 var pending_skill = {}
 var pending_item_id = ""
 var escape_enabled := true
+var current_turn := 1
 
 func _ready() -> void:
 	EventManager.battle_requested.connect(_on_battle_requested)
@@ -37,6 +38,7 @@ func start_battle(enemy_ids: Array, battle_bgm_path := "", can_escape := true):
 		return
 	PlayerManager.in_battle = true
 	escape_enabled = can_escape
+	current_turn = 1
 	var scene = preload("res://BattleScene.tscn")
 	battle_scene = scene.instantiate()
 	battle_scene.member_action_selected.connect(_on_member_action_selected)
@@ -201,6 +203,8 @@ func execute_turn():
 	selected_actions.clear()
 	current_member_index = 0
 	state = BattleState.MAIN_COMMAND
+	current_turn += 1
+	await battle_scene.show_message("%dターン目" % current_turn)
 	await battle_scene.show_main_commands()
 
 func get_action_priority_group(command_data: Dictionary) -> int:

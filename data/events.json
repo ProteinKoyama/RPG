@@ -1,0 +1,139 @@
+{
+	"debug_talk": {
+		"events": [
+			{
+				"type": "dialog",
+				"lines": [
+					{"speaker": "デバッグ", "message": "これはJSONで管理する会話イベントです。"},
+					{"speaker": "デバッグ", "message": "会話の後にフラグも設定されます。"}
+				]
+			},
+			{"type": "set_flag", "flag_key": "debug_talk_done", "value": true}
+		]
+	},
+	"debug_enter": {
+		"events": [
+			{
+				"type": "dialog",
+				"lines": [
+					{"speaker": "デバッグ", "message": "これは範囲に入った瞬間に発生するJSONイベントです。"}
+				]
+			}
+		]
+	},
+	"debug_give_item": {
+		"events": [
+			{"type": "give_item", "item_id": "potion", "amount": 1, "show_dialog": true}
+		]
+	},
+	"debug_battle": {
+		"events": [
+			{"type": "battle", "enemy_ids": ["slime"], "escape_enabled": true}
+		]
+	},
+	"debug_change_map": {
+		"events": [
+			{
+				"type": "change_map",
+				"scene_path": "res://scenes/room_scene.tscn",
+				"spawn_point": "PlayerSpawnPoint"
+			}
+		]
+	},
+	"scene1_npc_interaction": {
+		"events": [
+			{
+				"type": "flag_branch",
+				"flag_key": "scene1_npc_talk_done",
+				"when_true": "scene1_npc_repeat",
+				"when_false": "scene1_npc_first"
+			}
+		]
+	},
+	"scene1_npc_first": {
+		"events": [
+			{
+				"type": "dialog",
+				"lines": [
+					{"speaker": "NPC", "message": "直接話しかけてくれたんだね。"},
+					{"speaker": "NPC", "message": "この会話は、NPCに話しかけた最初の一回だけ表示されるよ。"}
+				]
+			},
+			{"type": "set_flag", "flag_key": "scene1_npc_talk_done", "value": true}
+		]
+	},
+	"scene1_npc_repeat": {
+		"events": [
+			{
+				"type": "dialog",
+				"lines": [
+					{"speaker": "NPC", "message": "また来たんだね。"},
+					{"speaker": "NPC", "message": "もう初回の案内は済んだから、あとは自由に見ていって。"}
+				]
+			}
+		]
+	},
+	"scene1_intro": {
+		"events": [
+			{
+				"type": "dialog",
+				"lines": [
+					{"speaker": "NPC", "message": "待って。ここはScene1だよ。"},
+					{"speaker": "NPC", "message": "この先へ進む前に、周りを少し見ていくといいかも。"}
+				]
+			},
+			{"type": "set_flag", "flag_key": "scene1_intro_done", "value": true}
+		]
+	},
+	"scene1_to_room": {
+		"events": [
+			{"type": "change_map", "scene_path": "uid://bwarfbif7soh6", "spawn_point": "FromScene1"}
+		]
+	},
+	"room_intro": {
+		"events": [
+			{"type": "dialog", "lines": [{"speaker": "", "message": "知らない天井だ。"}]},
+			{"type": "set_flag", "flag_key": "room_intro_done", "value": true}
+		]
+	},
+	"room_moeko_battle": {
+		"events": [
+			{
+				"type": "battle",
+				"enemy_ids": ["enemy_moeko", "speaker", "speaker"],
+				"escape_enabled": true,
+				"on_win": "room_moeko_win"
+			}
+		]
+	},
+	"room_moeko_win": {
+		"events": [
+			{"type": "dialog", "lines": [{"speaker": "モエ子", "message": "負けても悔しくないんだからね！"}]}
+		]
+	},
+	"room_join_sakuraba": {
+		"events": [
+			{"type": "join", "member_id": "sakuraba", "show_dialog": true}
+		]
+	},
+	"room_to_debug": {
+		"events": [
+			{"type": "change_map", "scene_path": "res://scenes/debug_room.tscn", "spawn_point": "PlayerSpawnPoint"}
+		]
+	},
+	"room_to_previous": {
+		"events": [
+			{"type": "change_map", "scene_path": "uid://kaeiaq1bkmck", "spawn_point": "FromMyRoom"}
+		]
+	},
+	"npc_moeko_join": {
+		"events": [
+			{"type": "join", "member_id": "moeko", "show_dialog": true}
+		]
+	},
+	"npc_roma_battle": {
+		"events": [
+			{"type": "battle", "enemy_ids": ["slime", "slime"], "escape_enabled": true}
+		]
+	}
+}

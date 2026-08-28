@@ -1,5 +1,7 @@
 extends Node
 
+const MAX_BATTLE_MESSAGE_LINES := 5
+
 @onready var battle_dialog := $UI/MessageWindow/Label
 @onready var main_commands := $UI/MainCommands
 @onready var fight_button := $UI/MainCommands/FightButton
@@ -54,9 +56,15 @@ func _ready() -> void:
 	await get_tree().process_frame
 	fight_button.grab_focus()
 
-func show_message(message):
-	print(message)
-	battle_dialog.text = message
+func show_message(message) -> void:
+	var message_text := str(message)
+	print(message_text)
+	var new_lines := message_text.split("\n")
+	for index in range(new_lines.size() - 1, -1, -1):
+		messages.push_front(new_lines[index])
+	while messages.size() > MAX_BATTLE_MESSAGE_LINES:
+		messages.pop_back()
+	battle_dialog.text = "\n".join(messages)
 	await get_tree().create_timer(1.0).timeout
 
 func show_main_commands():
