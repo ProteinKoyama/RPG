@@ -88,6 +88,16 @@ func face_direction(direction: String):
 		animated_sprite.animation = animation_name
 		animated_sprite.stop()
 
+func move_to_position(target_position: Vector2, speed := 120.0) -> void:
+	face_position(target_position)
+	if animated_sprite.sprite_frames != null and animated_sprite.sprite_frames.has_animation(animated_sprite.animation):
+		animated_sprite.play()
+	var duration: float = global_position.distance_to(target_position) / maxf(float(speed), 1.0)
+	var tween := create_tween()
+	tween.tween_property(self, "global_position", target_position, duration)
+	await tween.finished
+	animated_sprite.stop()
+
 func _on_body_entered(body):
 	if body.name == "Player":
 		player_in_range = true

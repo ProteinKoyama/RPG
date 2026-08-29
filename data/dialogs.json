@@ -9,5 +9,66 @@
 	"npc_girl_castle": [
 		["少女", "ここはお城です"],
 		["少女", "危ないので気をつけてください"]
-  	]
+	],
+	"debug_talk": [
+		["デバッグ", "これはJSONで管理する会話イベントです。"],
+		["デバッグ", "会話の後にフラグも設定されます。"]
+	],
+	"debug_enter": [
+		["デバッグ", "これは範囲に入った瞬間に発生するJSONイベントです。"]
+	],
+	"scene1_npc_first": [
+		["NPC", "直接話しかけてくれたんだね。"],
+		["NPC", "この会話は、NPCに話しかけた最初の一回だけ表示されるよ。"]
+	],
+	"scene1_npc_repeat": [
+		["NPC", "また来たんだね。"],
+		["NPC", "もう初回の案内は済んだから、あとは自由に見ていって。"]
+	],
+	"scene1_intro": [
+		["NPC", "待って。ここはScene1だよ。"],
+		["NPC", "この先へ進む前に、周りを少し見ていくといいかも。"]
+	],
+	"room_intro": [
+		["", "知らない天井だ。"]
+	],
+	"room_moeko_win": [
+		["モエ子", "負けても悔しくないんだからね！"]
+	],
+	"system_party_full": [
+		["加入", "これ以上仲間を増やせない。"]
+	],
+	"system_member_joined": [
+		["加入", "{member_name}が加入した！"]
+	],
+	"system_item_received": [
+		["入手", "{item_name}を入手した！"]
+	],
+	"system_skill_learned": [
+		["習得", "{member_name}は{skill_name}を覚えた！"]
+	],
+	"system_skill_learn_failed": [
+		["習得", "{member_name}は{skill_name}を覚えられなかった。"]
+	],
+	"npc_five_choice_prompt": [
+		["NPC", "何をしますか？"]
+	],
+	"doctor_choice_prompt": [
+		["", "何について聞きたい？"]
+	],
+	"npc_five_choice_result_1": [
+		["NPC", "一つ目の選択肢が選ばれました。"]
+	],
+	"npc_five_choice_result_2": [
+		["NPC", "二つ目の選択肢が選ばれました。"]
+	],
+	"npc_five_choice_result_3": [
+		["NPC", "三つ目の選択肢が選ばれました。"]
+	],
+	"npc_five_choice_result_4": [
+		["NPC", "四つ目の選択肢が選ばれました。"]
+	],
+	"npc_five_choice_result_5": [
+		["NPC", "五つ目の選択肢が選ばれました。"]
+	]
 }

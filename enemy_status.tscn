@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://djmda6reveb8t" path="res://assets/pictures/cursor.png" id="2_i2w16"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_i2w16"]
-font_size = 24
+font_size = 28
 outline_size = 10
 outline_color = Color(0, 0, 0, 1)
 
@@ -39,6 +39,15 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
 text = "Enemy"
 label_settings = SubResource("LabelSettings_i2w16")
+horizontal_alignment = 1
+
+[node name="HPLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+text = "0/0"
 horizontal_alignment = 1
 
 [node name="EffectLabel" type="Label" parent="VBoxContainer"]

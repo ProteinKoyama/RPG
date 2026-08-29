@@ -179,6 +179,10 @@ func _get_status_effect_name(status_id: String) -> String:
 
 func _get_element_text(element: String) -> String:
 	match element:
+		"fire":
+			return "炎属性の"
 		"electric":
 			return "電気属性の"
+		"ice":
+			return "氷属性の"
 	return ""

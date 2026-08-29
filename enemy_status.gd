@@ -2,6 +2,7 @@ extends Control
 
 @onready var enemy_sprite = $VBoxContainer/EnemySprite
 @onready var name_label = $VBoxContainer/NameLabel
+@onready var hp_label = $VBoxContainer/HPLabel
 @onready var effect_label = $VBoxContainer/EffectLabel
 @onready var target_cursor = $TargetCursor
 
@@ -55,7 +56,14 @@ func setup(enemy):
 	_update_target_cursor_position()
 
 func refresh_effects():
+	refresh_hp()
 	effect_label.text = _get_effect_text(enemy_ref)
+
+func refresh_hp() -> void:
+	if enemy_ref == null:
+		hp_label.text = ""
+		return
+	hp_label.text = "%d/%d" % [enemy_ref.hp, enemy_ref.max_hp]
 
 func _get_effect_text(enemy) -> String:
 	if enemy == null or !enemy.has_method("get_active_effect_labels"):

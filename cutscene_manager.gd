@@ -32,7 +32,8 @@ func play_events(events: Array) -> bool:
 		match _get_event_type(e):
 			"talk":
 				var dialog_id = e.get("dialog_id", "") if e is Dictionary else e.dialog_id
-				await EventManager.show_dialog_by_id(dialog_id)
+				var variables = e.get("variables", {}) if e is Dictionary else {}
+				await DialogManager.show_dialog_by_id(dialog_id, variables)
 
 			"direct_talk":
 				var lines
@@ -41,6 +42,28 @@ func play_events(events: Array) -> bool:
 				else:
 					lines = e.lines if e is DirectTalkEvent else e.direct_dialog_lines
 				await _show_direct_dialog(lines)
+
+			"choice":
+				if !(e is Dictionary):
+					push_error("choice event must be defined in JSON")
+					continue
+				var options = e.get("options", [])
+				if !(options is Array) or options.is_empty():
+					push_error("choice event options are empty")
+					continue
+				var selected_index := await DialogManager.show_choice(
+					e.get("prompt_dialog_id", ""),
+					options
+				)
+				if selected_index < 0 or selected_index >= options.size():
+					continue
+				var selected_option = options[selected_index]
+				if !(selected_option is Dictionary):
+					continue
+				var selected_event_id := str(selected_option.get("event_id", ""))
+				if selected_event_id != "":
+					if await play_event_source(selected_event_id):
+						return true
 
 			"battle":
 				var enemy_ids
@@ -77,13 +100,11 @@ func play_events(events: Array) -> bool:
 				if show_dialog:
 					var member_name = PartyManager.get_character_name(member_id)
 					if !joined:
-						await DialogManager.show_dialog_data([
-							["加入", "これ以上仲間を増やせない。"]
-						])
+						await DialogManager.show_dialog_by_id("system_party_full")
 						continue
-					await DialogManager.show_dialog_data([
-						["加入", member_name + "が加入した！"]
-					])
+					await DialogManager.show_dialog_by_id("system_member_joined", {
+						"member_name": member_name
+					})
 
 			"item":
 				var item_id = e.get("item_id", "") if e is Dictionary else e.item_id
@@ -99,9 +120,9 @@ func play_events(events: Array) -> bool:
 				print("item added:", item_id, amount)
 				if show_dialog:
 					var item_name = ItemDatabase.get_item_name(item_id)
-					await DialogManager.show_dialog_data([
-						["入手", item_name + "を入手した！"]
-					])
+					await DialogManager.show_dialog_by_id("system_item_received", {
+						"item_name": item_name
+					})
 
 			"learn_skill":
 				var member_id
@@ -121,13 +142,15 @@ func play_events(events: Array) -> bool:
 					var member_name = PartyManager.get_character_name(member_id)
 					var skill_name = SkillDatabase.get_skill_name(skill_id)
 					if learned:
-						await DialogManager.show_dialog_data([
-							["習得", member_name + "は" + skill_name + "を覚えた！"]
-						])
+						await DialogManager.show_dialog_by_id("system_skill_learned", {
+							"member_name": member_name,
+							"skill_name": skill_name
+						})
 					else:
-						await DialogManager.show_dialog_data([
-							["習得", member_name + "は" + skill_name + "を覚えられなかった。"]
-						])
+						await DialogManager.show_dialog_by_id("system_skill_learn_failed", {
+							"member_name": member_name,
+							"skill_name": skill_name
+						})
 
 			"map":
 				var scene_path
@@ -162,6 +185,20 @@ func play_events(events: Array) -> bool:
 				var target_path = NodePath(e.get("target_node_path", "")) if e is Dictionary else e.target_node_path
 				var animation_name = e.get("animation_name", "") if e is Dictionary else e.animation_name
 				_play_node_animation(target_path, animation_name)
+
+			"move_node":
+				if !(e is Dictionary):
+					push_error("move_node event must be defined in JSON")
+					continue
+				await _move_node(
+					NodePath(e.get("target_node_path", "")),
+					NodePath(e.get("destination_node_path", "")),
+					float(e.get("speed", 120.0))
+				)
+
+			"remove_node":
+				var remove_target_path = NodePath(e.get("target_node_path", "")) if e is Dictionary else NodePath("")
+				_remove_node(remove_target_path)
 	return false
 
 func _get_event_type(event_data) -> StringName:
@@ -169,7 +206,7 @@ func _get_event_type(event_data) -> StringName:
 		var json_type := StringName(event_data.get("type", ""))
 		match json_type:
 			&"dialog":
-				return &"direct_talk"
+				return &"talk" if event_data.has("dialog_id") else &"direct_talk"
 			&"set_flag":
 				return &"flag"
 			&"give_item":
@@ -294,6 +331,36 @@ func _play_node_animation(target_node_path: NodePath, animation_name: String) ->
 		if animated_sprite.sprite_frames.has_animation(animation_name):
 			animated_sprite.animation = animation_name
 			animated_sprite.stop()
+
+func _move_node(target_node_path: NodePath, destination_node_path: NodePath, speed: float) -> void:
+	var current_scene = get_tree().current_scene
+	if current_scene == null:
+		return
+	var target = current_scene.get_node_or_null(target_node_path)
+	var destination = current_scene.get_node_or_null(destination_node_path)
+	if target == null:
+		push_error("move_node target not found: " + str(target_node_path))
+		return
+	if destination == null:
+		push_error("move_node destination not found: " + str(destination_node_path))
+		return
+	if target.has_method("move_to_position"):
+		await target.move_to_position(destination.global_position, speed)
+		return
+	var duration: float = target.global_position.distance_to(destination.global_position) / maxf(speed, 1.0)
+	var tween := create_tween()
+	tween.tween_property(target, "global_position", destination.global_position, duration)
+	await tween.finished
+
+func _remove_node(target_node_path: NodePath) -> void:
+	var current_scene = get_tree().current_scene
+	if current_scene == null:
+		return
+	var target = current_scene.get_node_or_null(target_node_path)
+	if target == null:
+		push_error("remove_node target not found: " + str(target_node_path))
+		return
+	target.queue_free()
 
 func _show_direct_dialog(lines: Array) -> void:
 	if lines.is_empty():

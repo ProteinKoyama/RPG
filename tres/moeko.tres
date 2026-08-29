@@ -19,4 +19,5 @@ animations = [{
 script = ExtResource("1_uasbe")
 portrait = ExtResource("1_ejn60")
 sprite_frames = SubResource("SpriteFrames_ojhy0")
+event_id = "npc_moeko_join"
 metadata/_custom_type_script = "uid://dl7ossnnwucgq"

@@ -7,8 +7,20 @@ func _ready() -> void:
 		PartyManager.add_member("girl")
 		EventManager.opening_done = true
 	else: pass
-	PlayerManager.spawn_player($PlayerSpawnPoint.global_position)
+	_spawn_player_for_direct_scene_start()
 	EventManager.connect("request_show_dialog", Callable(self, "_on_request_show_dialog"))
+
+func _spawn_player_for_direct_scene_start() -> void:
+	# シーン遷移中はGameManagerが指定されたマーカーへ配置する。
+	if GameManager.next_spawn_point_name != "":
+		return
+	var spawn_point := get_node_or_null("PlayerSpawnPoint") as Marker2D
+	if spawn_point == null:
+		spawn_point = get_node_or_null("FromScene1") as Marker2D
+	if spawn_point == null:
+		push_error("Player spawn point not found in " + scene_file_path)
+		return
+	PlayerManager.spawn_player(spawn_point.global_position)
 func _process(_delta: float) -> void:
 	pass
 

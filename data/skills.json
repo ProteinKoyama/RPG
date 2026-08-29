@@ -76,6 +76,14 @@
 		"effect_type": "howling",
 		"priority": 1
 	},
+	"ignition": {
+		"id": "ignition",
+		"name": "発火",
+		"sp_cost": 0,
+		"target": "enemy",
+		"power": 1.0,
+		"element": "fire"
+	},
 	"electrogenesis": {
 		"id": "electrogenesis",
 		"name": "起電",
@@ -83,6 +91,14 @@
 		"target": "enemy",
 		"power": 1.0,
 		"element": "electric"
+	},
+	"freezing": {
+		"id": "freezing",
+		"name": "凍結",
+		"sp_cost": 0,
+		"target": "enemy",
+		"power": 1.0,
+		"element": "ice"
 	},
 	"inspect": {
 		"id": "inspect",

@@ -465,8 +465,12 @@ func _get_element_weakness_text(target) -> String:
 
 func _get_element_name(element: String) -> String:
 	match element:
+		"fire":
+			return "炎"
 		"electric":
 			return "電気"
+		"ice":
+			return "氷"
 	return element
 
 func _join_strings(values: Array, separator: String) -> String:

@@ -2,7 +2,10 @@ extends Node
 var DialogScene := preload("res://DialogRoot.tscn")
 var entered = false
 func _ready() -> void:
-	
+	if EventManager.get_flag("scene1_intro_done"):
+		var intro_npc := get_node_or_null("IntroNPC")
+		if intro_npc != null:
+			intro_npc.queue_free()
 	EventManager.connect("request_show_dialog", Callable(self, "_on_request_show_dialog"))
 	pass
 func _process(_delta: float) -> void:

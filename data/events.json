@@ -1,24 +1,13 @@
 {
 	"debug_talk": {
 		"events": [
-			{
-				"type": "dialog",
-				"lines": [
-					{"speaker": "デバッグ", "message": "これはJSONで管理する会話イベントです。"},
-					{"speaker": "デバッグ", "message": "会話の後にフラグも設定されます。"}
-				]
-			},
+			{"type": "dialog", "dialog_id": "debug_talk"},
 			{"type": "set_flag", "flag_key": "debug_talk_done", "value": true}
 		]
 	},
 	"debug_enter": {
 		"events": [
-			{
-				"type": "dialog",
-				"lines": [
-					{"speaker": "デバッグ", "message": "これは範囲に入った瞬間に発生するJSONイベントです。"}
-				]
-			}
+			{"type": "dialog", "dialog_id": "debug_enter"}
 		]
 	},
 	"debug_give_item": {
@@ -52,36 +41,25 @@
 	},
 	"scene1_npc_first": {
 		"events": [
-			{
-				"type": "dialog",
-				"lines": [
-					{"speaker": "NPC", "message": "直接話しかけてくれたんだね。"},
-					{"speaker": "NPC", "message": "この会話は、NPCに話しかけた最初の一回だけ表示されるよ。"}
-				]
-			},
+			{"type": "dialog", "dialog_id": "scene1_npc_first"},
 			{"type": "set_flag", "flag_key": "scene1_npc_talk_done", "value": true}
 		]
 	},
 	"scene1_npc_repeat": {
 		"events": [
-			{
-				"type": "dialog",
-				"lines": [
-					{"speaker": "NPC", "message": "また来たんだね。"},
-					{"speaker": "NPC", "message": "もう初回の案内は済んだから、あとは自由に見ていって。"}
-				]
-			}
+			{"type": "dialog", "dialog_id": "scene1_npc_repeat"}
 		]
 	},
 	"scene1_intro": {
 		"events": [
+			{"type": "dialog", "dialog_id": "scene1_intro"},
 			{
-				"type": "dialog",
-				"lines": [
-					{"speaker": "NPC", "message": "待って。ここはScene1だよ。"},
-					{"speaker": "NPC", "message": "この先へ進む前に、周りを少し見ていくといいかも。"}
-				]
+				"type": "move_node",
+				"target_node_path": "IntroNPC",
+				"destination_node_path": "ToDoctorRoomDoor",
+				"speed": 120.0
 			},
+			{"type": "remove_node", "target_node_path": "IntroNPC"},
 			{"type": "set_flag", "flag_key": "scene1_intro_done", "value": true}
 		]
 	},
@@ -90,9 +68,14 @@
 			{"type": "change_map", "scene_path": "uid://bwarfbif7soh6", "spawn_point": "FromScene1"}
 		]
 	},
+	"scene1_to_doctor_room": {
+		"events": [
+			{"type": "change_map", "scene_path": "res://scenes/doctor_room.tscn", "spawn_point": "FromScene1"}
+		]
+	},
 	"room_intro": {
 		"events": [
-			{"type": "dialog", "lines": [{"speaker": "", "message": "知らない天井だ。"}]},
+			{"type": "dialog", "dialog_id": "room_intro"},
 			{"type": "set_flag", "flag_key": "room_intro_done", "value": true}
 		]
 	},
@@ -108,7 +91,7 @@
 	},
 	"room_moeko_win": {
 		"events": [
-			{"type": "dialog", "lines": [{"speaker": "モエ子", "message": "負けても悔しくないんだからね！"}]}
+			{"type": "dialog", "dialog_id": "room_moeko_win"}
 		]
 	},
 	"room_join_sakuraba": {
@@ -121,7 +104,7 @@
 			{"type": "change_map", "scene_path": "res://scenes/debug_room.tscn", "spawn_point": "PlayerSpawnPoint"}
 		]
 	},
-	"room_to_previous": {
+	"myroom_to_previous": {
 		"events": [
 			{"type": "change_map", "scene_path": "uid://kaeiaq1bkmck", "spawn_point": "FromMyRoom"}
 		]
@@ -135,5 +118,40 @@
 		"events": [
 			{"type": "battle", "enemy_ids": ["slime", "slime"], "escape_enabled": true}
 		]
+	},
+	"doctor_choice_example": {
+		"events": [
+			{
+				"type": "choice",
+				"prompt_dialog_id": "doctor_choice_prompt",
+				"options": [
+					{"text": "病気について", "event_id": "npc_five_choice_event_1"},
+					{"text": "魔法について", "event_id": "doctor_learn_magic"},
+					{"text": "用事はない", "event_id": "npc_five_choice_event_3"},
+				]
+			}
+		]
+	},
+	"doctor_learn_magic": {
+		"events": [
+			{"type": "learn_skill", "member_id": "girl", "skill_id": "ignition", "show_dialog": true},
+			{"type": "learn_skill", "member_id": "girl", "skill_id": "electrogenesis", "show_dialog": true},
+			{"type": "learn_skill", "member_id": "girl", "skill_id": "freezing", "show_dialog": true}
+		]
+	},
+	"npc_five_choice_event_1": {
+		"events": [{"type": "dialog", "dialog_id": "npc_five_choice_result_1"}]
+	},
+	"npc_five_choice_event_2": {
+		"events": [{"type": "dialog", "dialog_id": "npc_five_choice_result_2"}]
+	},
+	"npc_five_choice_event_3": {
+		"events": [{"type": "dialog", "dialog_id": "npc_five_choice_result_3"}]
+	},
+	"npc_five_choice_event_4": {
+		"events": [{"type": "dialog", "dialog_id": "npc_five_choice_result_4"}]
+	},
+	"npc_five_choice_event_5": {
+		"events": [{"type": "dialog", "dialog_id": "npc_five_choice_result_5"}]
 	}
 }

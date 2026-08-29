@@ -30,7 +30,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					$IngameMenu.show()
 					for i in len(dialog[index][1]):
 						var ingame_menu_button = Button.new()
-						ingame_menu_button.add_theme_font_size_override("font_size", 24)
+						ingame_menu_button.add_theme_font_size_override("font_size", 28)
 						ingame_menu_button.text = dialog[index][1][i]
 						ingame_menu_button.connect("pressed",Callable(self,"_on_ingame_menu_button_pressed").bind(i,dialog[index][1][i]))
 						$IngameMenu/VBoxContainer.add_child(ingame_menu_button)
