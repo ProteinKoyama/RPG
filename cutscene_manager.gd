@@ -193,7 +193,8 @@ func play_events(events: Array) -> bool:
 				await _move_node(
 					NodePath(e.get("target_node_path", "")),
 					NodePath(e.get("destination_node_path", "")),
-					float(e.get("speed", 120.0))
+					float(e.get("speed", 120.0)),
+					str(e.get("axis", "both"))
 				)
 
 			"remove_node":
@@ -332,7 +333,12 @@ func _play_node_animation(target_node_path: NodePath, animation_name: String) ->
 			animated_sprite.animation = animation_name
 			animated_sprite.stop()
 
-func _move_node(target_node_path: NodePath, destination_node_path: NodePath, speed: float) -> void:
+func _move_node(
+	target_node_path: NodePath,
+	destination_node_path: NodePath,
+	speed: float,
+	axis := "both"
+) -> void:
 	var current_scene = get_tree().current_scene
 	if current_scene == null:
 		return
@@ -344,12 +350,18 @@ func _move_node(target_node_path: NodePath, destination_node_path: NodePath, spe
 	if destination == null:
 		push_error("move_node destination not found: " + str(destination_node_path))
 		return
+	var destination_position: Vector2 = destination.global_position
+	match axis:
+		"horizontal":
+			destination_position.y = target.global_position.y
+		"vertical":
+			destination_position.x = target.global_position.x
 	if target.has_method("move_to_position"):
-		await target.move_to_position(destination.global_position, speed)
+		await target.move_to_position(destination_position, speed)
 		return
-	var duration: float = target.global_position.distance_to(destination.global_position) / maxf(speed, 1.0)
+	var duration: float = target.global_position.distance_to(destination_position) / maxf(speed, 1.0)
 	var tween := create_tween()
-	tween.tween_property(target, "global_position", destination.global_position, duration)
+	tween.tween_property(target, "global_position", destination_position, duration)
 	await tween.finished
 
 func _remove_node(target_node_path: NodePath) -> void:

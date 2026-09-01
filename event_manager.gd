@@ -69,13 +69,16 @@ func _on_battle_finished(result):
 	PlayerManager.can_move = true
 	
 func start_cutscene(event_source) -> void:
-	PlayerManager.can_move = false
+	# 会話・NPC移動・画面遷移などを含む演出全体で、ゲーム操作を共通して無効化する。
+	# 会話UIが一時的に can_move を戻しても、このロックが演出終了まで優先される。
+	PlayerManager.acquire_input_lock()
 	var cutscene_manager = _get_cutscene_manager()
 	cutscene_requested.emit(event_source)
 	print("cutscene requested")
 	if cutscene_manager != null:
 		await cutscene_manager.cutscene_finished
-	if !PlayerManager.in_battle:
+	PlayerManager.release_input_lock()
+	if !PlayerManager.in_battle and !PlayerManager.is_input_locked():
 		PlayerManager.can_move = true
 
 func _get_cutscene_manager():

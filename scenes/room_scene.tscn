@@ -3,11 +3,6 @@
 [ext_resource type="Texture2D" uid="uid://c1brha4ikrgcv" path="res://assets/tile1.png" id="1_jinkd"]
 [ext_resource type="Script" uid="uid://bgel4olso2gvl" path="res://room_scene.gd" id="1_ueye4"]
 [ext_resource type="Texture2D" uid="uid://ppexm72wshgh" path="res://assets/pictures/Base_BaseChip_pipo.png" id="3_nukew"]
-[ext_resource type="PackedScene" uid="uid://bixgx6is1r0ad" path="res://npc.tscn" id="5_atbl0"]
-[ext_resource type="Resource" uid="uid://cnljyilgxdwof" path="res://tres/moeko.tres" id="5_qfq5l"]
-[ext_resource type="Script" uid="uid://dguwd8iuyakui" path="res://npc_event_data.gd" id="5_w1efa"]
-[ext_resource type="Script" uid="uid://dl7ossnnwucgq" path="res://NPCData.gd" id="6_no7j0"]
-[ext_resource type="Texture2D" uid="uid://dvxwrdaxxg1a6" path="res://assets/charachip/Chara_negako_common.png" id="8_2joa2"]
 [ext_resource type="PackedScene" path="res://GenericEventArea.tscn" id="11_ir6st"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jqbpo"]
@@ -6157,29 +6152,6 @@ physics_layer_0/collision_mask = 3
 sources/0 = SubResource("TileSetAtlasSource_rgwj0")
 sources/1 = SubResource("TileSetAtlasSource_w1efa")
 
-[sub_resource type="Resource" id="Resource_rnso5"]
-script = ExtResource("6_no7j0")
-event_id = "room_moeko_battle"
-metadata/_custom_type_script = "uid://dl7ossnnwucgq"
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_ir6st"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("8_2joa2")
-}],
-"loop": 1,
-"name": &"default",
-"speed": 5.0
-}]
-
-[sub_resource type="Resource" id="Resource_qfq5l"]
-script = ExtResource("6_no7j0")
-portrait = ExtResource("8_2joa2")
-sprite_frames = SubResource("SpriteFrames_ir6st")
-event_id = "room_join_sakuraba"
-metadata/_custom_type_script = "uid://dl7ossnnwucgq"
-
 [node name="RoomScene" type="Node" unique_id=1040189506]
 script = ExtResource("1_ueye4")
 
@@ -6216,18 +6188,6 @@ one_shot = true
 disable_if_flag_key = "room_intro_done"
 event_size = Vector2(220, 180)
 
-[node name="NPC" parent="." unique_id=1779006566 instance=ExtResource("5_atbl0")]
-position = Vector2(716, 195)
-data = ExtResource("5_qfq5l")
-
-[node name="NPC2" parent="." unique_id=1289621947 instance=ExtResource("5_atbl0")]
-position = Vector2(716.99994, 375.99997)
-data = SubResource("Resource_rnso5")
-
-[node name="NPC4" parent="." unique_id=1013824209 instance=ExtResource("5_atbl0")]
-position = Vector2(592, 197)
-data = SubResource("Resource_qfq5l")
-
 [node name="GenericEventArea" parent="." unique_id=1227074923 instance=ExtResource("11_ir6st")]
 position = Vector2(654, 560)
 scale = Vector2(0.5, 1)
@@ -6239,3 +6199,9 @@ position = Vector2(517, 649)
 scale = Vector2(2, 0.5)
 trigger_mode = "enter"
 event_id = "myroom_to_previous"
+
+[node name="GenericEventArea3" parent="." unique_id=122536886 instance=ExtResource("11_ir6st")]
+position = Vector2(400, 139)
+scale = Vector2(0.5, 0.6)
+event_id = "debug_give_item"
+one_shot = true

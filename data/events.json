@@ -12,7 +12,7 @@
 	},
 	"debug_give_item": {
 		"events": [
-			{"type": "give_item", "item_id": "potion", "amount": 1, "show_dialog": true}
+			{"type": "give_item", "item_id": "white_night_sword", "amount": 1, "show_dialog": true}
 		]
 	},
 	"debug_battle": {
@@ -57,6 +57,7 @@
 				"type": "move_node",
 				"target_node_path": "IntroNPC",
 				"destination_node_path": "ToDoctorRoomDoor",
+				"axis": "horizontal",
 				"speed": 120.0
 			},
 			{"type": "remove_node", "target_node_path": "IntroNPC"},
@@ -71,6 +72,16 @@
 	"scene1_to_doctor_room": {
 		"events": [
 			{"type": "change_map", "scene_path": "res://scenes/doctor_room.tscn", "spawn_point": "FromScene1"}
+		]
+	},
+	"scene1_to_exam_room": {
+		"events": [
+			{"type": "change_map", "scene_path": "res://scenes/exam_room.tscn", "spawn_point": "FromScene1"}
+		]
+	},
+	"exam_room_to_scene1": {
+		"events": [
+			{"type": "change_map", "scene_path": "res://scenes/scene1.tscn", "spawn_point": "FromExamRoom"}
 		]
 	},
 	"room_intro": {
@@ -127,7 +138,7 @@
 				"options": [
 					{"text": "病気について", "event_id": "npc_five_choice_event_1"},
 					{"text": "魔法について", "event_id": "doctor_learn_magic"},
-					{"text": "用事はない", "event_id": "npc_five_choice_event_3"},
+					{"text": "用事はない", "event_id": "npc_five_choice_event_3"}
 				]
 			}
 		]
@@ -142,16 +153,7 @@
 	"npc_five_choice_event_1": {
 		"events": [{"type": "dialog", "dialog_id": "npc_five_choice_result_1"}]
 	},
-	"npc_five_choice_event_2": {
-		"events": [{"type": "dialog", "dialog_id": "npc_five_choice_result_2"}]
-	},
 	"npc_five_choice_event_3": {
 		"events": [{"type": "dialog", "dialog_id": "npc_five_choice_result_3"}]
-	},
-	"npc_five_choice_event_4": {
-		"events": [{"type": "dialog", "dialog_id": "npc_five_choice_result_4"}]
-	},
-	"npc_five_choice_event_5": {
-		"events": [{"type": "dialog", "dialog_id": "npc_five_choice_result_5"}]
 	}
 }
